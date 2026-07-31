@@ -108,10 +108,12 @@
 
   window.addEventListener("hashchange", () => router(_user, _cache));
 
-  // Boot public by default; upgrade to the signed-in user if a session exists.
+  // Login required - no anonymous access. Show the sign-in screen until a
+  // valid staff session exists.
   (async () => {
-    let user = PUBLIC;
-    try { const existing = await DATA.getSession(); if (existing) user = existing; } catch (e) { /* stay public */ }
-    await boot(user);
+    let existing = null;
+    try { existing = await DATA.getSession(); } catch (e) { /* show login */ }
+    if (existing) await boot(existing);
+    else showLogin();
   })();
 })();
