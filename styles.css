@@ -814,7 +814,7 @@ table.dt td.num, table.dt th.num { text-align: right; font-variant-numeric: tabu
 .pp-row {
   display: flex; align-items: center; gap: 14px;
   background: var(--card); border: 1px solid var(--line);
-  border-radius: var(--r-lg); padding: 14px 18px; box-shadow: var(--shadow-sm);
+  border-radius: var(--r-lg); padding: 11px 18px; box-shadow: var(--shadow-sm);
 }
 .pp-row-top { border-color: var(--sky); }
 .pp-row-1 { border-left: 4px solid var(--yellow); }
@@ -827,7 +827,7 @@ table.dt td.num, table.dt th.num { text-align: right; font-variant-numeric: tabu
 .pp-team { font-family: var(--serif); font-weight: 700; font-size: 15px; color: var(--ink); }
 .pp-pts { font-family: var(--serif); font-weight: 700; font-size: 20px; color: var(--blue-800); letter-spacing: -.01em; }
 .pp-pts-unit { font-size: 11px; font-weight: 600; color: var(--muted); margin-left: 3px; }
-.pp-bar-track { height: 8px; background: var(--sky-tint); border-radius: 999px; overflow: hidden; margin: 9px 0 7px; }
+.pp-bar-track { height: 5px; background: var(--sky-tint); border-radius: 999px; overflow: hidden; margin: 7px 0 5px; }
 .pp-bar-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--sky-deep), var(--blue-800)); transition: width .6s ease; }
 .pp-row-1 .pp-bar-fill { background: linear-gradient(90deg, var(--yellow), var(--yellow-deep)); }
 .pp-row-meta { display: flex; gap: 16px; font-size: 12px; color: var(--slate); }
