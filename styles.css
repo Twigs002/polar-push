@@ -161,7 +161,7 @@ body {
 .app { min-height: 100vh; display: flex; flex-direction: column; }
 
 .topnav {
-  background: var(--blue-900);
+  background: var(--blue-800);
   color: #fff;
   display: flex;
   align-items: center;
@@ -706,13 +706,13 @@ table.dt td.num, table.dt th.num { text-align: right; font-variant-numeric: tabu
   display: flex; align-items: center; gap: 20px;
   padding: 22px 26px; margin-bottom: 20px;
   border-radius: var(--r-lg);
-  background: var(--card); color: var(--ink);
-  border: 1px solid var(--line); box-shadow: var(--shadow-sm);
+  background: var(--sky-tint); color: var(--ink);
+  border: 1px solid #CBE0F4; box-shadow: var(--shadow-sm);
 }
 .pp-banner-ic {
   width: 52px; height: 52px; border-radius: 13px; flex: none;
   display: grid; place-items: center; font-size: 24px;
-  background: var(--sky-tint); border: 1px solid #CBE0F4;
+  background: var(--blue-800); border: none;
 }
 .pp-banner-body { flex: 1 1 auto; min-width: 0; }
 .pp-eyebrow {
@@ -735,10 +735,10 @@ table.dt td.num, table.dt th.num { text-align: right; font-variant-numeric: tabu
   font-family: var(--serif); font-weight: 700; font-size: 20px; color: var(--ink);
   letter-spacing: -.01em; margin-bottom: 9px;
 }
-.pp-progress { height: 7px; border-radius: 999px; overflow: hidden; background: var(--sky-tint); }
+.pp-progress { height: 7px; border-radius: 999px; overflow: hidden; background: #fff; border: 1px solid #CBE0F4; }
 .pp-progress-fill {
   height: 100%; border-radius: 999px;
-  background: var(--yellow-deep);
+  background: var(--blue-800);
   transition: width .6s ease;
 }
 .pp-clock-sub { margin-top: 8px; font-size: 12px; color: var(--muted); }
