@@ -43,8 +43,8 @@
     let phase;
     if (now < start) phase = `Kicks off ${fmtDay(start)}`;
     else if (now > end) phase = "Competition closed";
-    else phase = `Week ${week} of 8 · ${daysLeft} day${daysLeft === 1 ? "" : "s"} left`;
-    return { pct, week, phase, started: now >= start, ended: now > end };
+    else phase = `Week ${week} of 8`;
+    return { pct, week, phase, daysLeft, started: now >= start, ended: now > end };
   }
 
   function fmtDay(d) {
@@ -53,6 +53,16 @@
 
   function medal(rank) {
     return rank === 1 ? "🥇" : rank === 2 ? "🥈" : rank === 3 ? "🥉" : "";
+  }
+
+  // Dashboard-v2 style KPI tile: icon square + label + big value + footnote.
+  function kpiTile(icon, label, value, foot) {
+    return `<div class="pp-kpi">
+      <div class="pp-kpi-ic">${icon}</div>
+      <div class="pp-kpi-label">${label}</div>
+      <div class="pp-kpi-val">${value}</div>
+      <div class="pp-kpi-foot">${foot || ""}</div>
+    </div>`;
   }
 
   function render($view, ctx) {
@@ -78,24 +88,28 @@
     const podium = rows.slice(0, 3);
 
     $view.innerHTML = `
-      <section class="pp-hero">
-        <div class="pp-hero-glow" aria-hidden="true"></div>
-        <div class="pp-hero-main">
-          <div class="pp-hero-kicker">⚡❄️ Operation</div>
-          <h1 class="pp-hero-title">Polar&nbsp;Push</h1>
-          <div class="pp-hero-dates">${fmtDay(new Date(POLAR.START + "T00:00:00"))} – ${fmtDay(new Date(POLAR.END + "T00:00:00"))} 2026</div>
-          <div class="pp-hero-prize">🏆 ${escapeHtml(POLAR.PRIZE)}</div>
+      <section class="pp-banner">
+        <div class="pp-banner-ic" aria-hidden="true">⚡❄️</div>
+        <div class="pp-banner-body">
+          <div class="pp-eyebrow">Operation · ${fmtDay(new Date(POLAR.START + "T00:00:00"))} – ${fmtDay(new Date(POLAR.END + "T00:00:00"))} 2026</div>
+          <div class="pp-banner-title">Polar&nbsp;Push</div>
+          <div class="pp-banner-prize">🏆 ${escapeHtml(POLAR.PRIZE)}</div>
         </div>
-        <div class="pp-hero-clock">
+        <div class="pp-banner-clock">
           <div class="pp-phase">${escapeHtml(tl.phase)}</div>
           <div class="pp-progress"><div class="pp-progress-fill" style="width:${tl.pct.toFixed(1)}%"></div></div>
-          <div class="pp-clock-meta">
-            <span><strong>${totalEntries}</strong> verified deals</span>
-            <span><strong>${rows.length}</strong> teams</span>
-            ${pendingCount ? `<span class="pp-pending-pill">${pendingCount} pending${user.isEditor ? ` · <a href="#/admin">review</a>` : ""}</span>` : ""}
-          </div>
+          <div class="pp-clock-sub">${tl.started ? (tl.ended ? "Final" : `${tl.daysLeft} day${tl.daysLeft === 1 ? "" : "s"} to go`) : "Not started yet"}</div>
         </div>
       </section>
+
+      <div class="pp-kpis">
+        ${kpiTile("🏆", "Leading team", leader && leader.total > 0 ? escapeHtml(leader.name) : "—", leader && leader.total > 0 ? `${leader.total} pts` : "all to play for")}
+        ${kpiTile("✅", "Verified deals", String(totalEntries), "counting toward points")}
+        ${kpiTile("👥", "Teams", String(rows.length), "in the running")}
+        ${pendingCount
+          ? kpiTile("⏳", "Pending", String(pendingCount), user.isEditor ? `<a href="#/admin">review now →</a>` : "awaiting verification")
+          : kpiTile("📅", "Timeline", tl.started ? (tl.ended ? "Closed" : `${tl.daysLeft}d left`) : "Upcoming", tl.phase)}
+      </div>
 
       ${podium.length >= 2 ? renderPodium(podium, tl) : ""}
 
