@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Operation Polar Push — Quay 1</title>
+  <link rel="icon" type="image/png" href="assets/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Permanent+Marker&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <!-- Shared Quay 1 app switcher (superuser-only dropdown on the flag) -->
+  <script src="https://twigs002.github.io/quay-dashboard-v2/quay-nav.js" defer></script>
+</head>
+<body>
+  <!-- Login screen -->
+  <div id="login" class="login hidden">
+    <div class="login-card">
+      <div class="brand-mark">
+        <img class="login-logo" src="assets/quay1-logo-white.png" alt="Quay 1 International Realty" width="190">
+      </div>
+      <h1>Operation Polar Push <span class="pp-bolt">⚡❄️</span></h1>
+      <p class="sub">Sign in with your clock-in username + PIN.</p>
+      <form id="login-form">
+        <label>Username
+          <input id="login-user" type="text" autocomplete="username" placeholder="e.g. pagan" required>
+        </label>
+        <label>PIN
+          <input id="login-pin" type="password" autocomplete="current-password" required>
+        </label>
+        <button type="submit" class="btn-primary">Sign in</button>
+        <div id="login-error" class="error" hidden></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Main app shell -->
+  <div id="app" class="app hidden">
+    <header class="topnav">
+      <div class="brand">
+        <img class="brand-logo" src="assets/quay1-logo-white.png" alt="Quay 1 International Realty">
+        <span class="topnav-divider" aria-hidden="true"></span>
+        <span class="brand-name">Polar Push <span class="pp-bolt">⚡❄️</span></span>
+      </div>
+      <nav class="tabs">
+        <a href="#/leaderboard" data-tab="leaderboard">Leaderboard</a>
+        <a href="#/submit"      data-tab="submit">Submit a deal</a>
+        <a href="#/scoring"     data-tab="scoring">Scoring</a>
+        <a href="#/admin"       data-tab="admin" data-editor="1" hidden>Admin</a>
+      </nav>
+      <div class="user-chip">
+        <span id="user-label" class="muted"></span>
+        <button id="signout" class="btn-ghost">Sign out</button>
+      </div>
+    </header>
+
+    <main id="view" class="view view-wide">
+      <div class="loading">Loading…</div>
+    </main>
+  </div>
+
+  <!-- vendor -->
+  <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+
+  <!-- app -->
+  <script defer src="config.js"></script>
+  <script defer src="utils.js"></script>
+  <script defer src="points.js"></script>
+  <script defer src="data.js"></script>
+  <script defer src="views/leaderboard.js"></script>
+  <script defer src="views/submit.js"></script>
+  <script defer src="views/scoring.js"></script>
+  <script defer src="views/admin.js"></script>
+  <script defer src="app.js"></script>
+</body>
+</html>
