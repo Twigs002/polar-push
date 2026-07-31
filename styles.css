@@ -161,7 +161,7 @@ body {
 .app { min-height: 100vh; display: flex; flex-direction: column; }
 
 .topnav {
-  background: var(--blue-800);
+  background: var(--blue-900);
   color: #fff;
   display: flex;
   align-items: center;
@@ -178,8 +178,9 @@ body {
   width: 1px; height: 30px; background: rgba(255,255,255,0.28); flex: none;
 }
 .brand-name {
-  color: #fff; text-transform: uppercase; letter-spacing: 0.04em;
-  font-size: 15px; font-weight: 800;
+  font-family: var(--serif, 'Montserrat', sans-serif);
+  color: #fff; text-transform: uppercase; letter-spacing: 0.12em;
+  font-size: 14px; font-weight: 700;
 }
 .tabs {
   display: flex; gap: 4px; flex: 1;
@@ -719,9 +720,9 @@ table.dt td.num, table.dt th.num { text-align: right; font-variant-numeric: tabu
   color: var(--sky); font-weight: 700;
 }
 .pp-banner-title {
-  font-family: var(--marker, 'Permanent Marker', cursive);
-  font-size: 34px; line-height: 1.05; margin: 4px 0 8px; color: #fff;
-  letter-spacing: .01em;
+  font-family: var(--serif, 'Montserrat', sans-serif);
+  font-size: 30px; font-weight: 800; line-height: 1.05; margin: 3px 0 9px; color: #fff;
+  letter-spacing: -.01em;
 }
 .pp-banner-prize {
   display: inline-block;
@@ -777,9 +778,9 @@ table.dt td.num, table.dt th.num { text-align: right; font-variant-numeric: tabu
 .pp-pod-pts { font-family: var(--serif); font-weight: 700; font-size: 26px; color: var(--blue-800); letter-spacing: -.01em; }
 .pp-pod-pts span { font-size: 12px; font-weight: 600; color: var(--muted); margin-left: 3px; }
 .pp-pod-bar { margin-top: 14px; border-radius: 8px 8px 0 0; }
-.pp-pod-1 .pp-pod-bar { height: 72px; background: linear-gradient(180deg, var(--yellow), var(--yellow-deep)); }
-.pp-pod-2 .pp-pod-bar { height: 52px; background: linear-gradient(180deg, var(--sky), var(--sky-deep)); }
-.pp-pod-3 .pp-pod-bar { height: 38px; background: linear-gradient(180deg, #E4C7A1, #C69A6A); }
+.pp-pod-1 .pp-pod-bar { height: 72px; background: var(--yellow); }
+.pp-pod-2 .pp-pod-bar { height: 52px; background: var(--sky); }
+.pp-pod-3 .pp-pod-bar { height: 38px; background: #C69A6A; }
 .pp-pod-1 { transform: translateY(-8px); border-color: var(--yellow); }
 .pp-podium-pre .pp-pod-pts { color: var(--muted); }
 
@@ -923,7 +924,7 @@ table.dt td.num, table.dt th.num { text-align: right; font-variant-numeric: tabu
 @media (max-width: 720px) {
   .pp-banner { flex-wrap: wrap; }
   .pp-banner-clock { text-align: left; min-width: 0; width: 100%; }
-  .pp-banner-title { font-size: 30px; }
+  .pp-banner-title { font-size: 26px; }
   .pp-form-grid { grid-template-columns: 1fr 1fr; }
   .pp-calc-controls { grid-template-columns: 1fr; }
   .pp-podium { gap: 8px; }
