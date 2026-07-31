@@ -42,8 +42,8 @@
     $view.innerHTML = `
       <div class="pp-submit">
         <div class="pp-card pp-entry-card">
-          <h2>Submit a mandate or sale</h2>
-          <p class="muted">Log your deal here and it goes to front office for verification. It only earns points once an admin confirms it's signed and complete.</p>
+          <h2>Submit a mandate</h2>
+          <p class="muted">Log your signed mandate and attach the document. It goes to front office and only earns points once an admin verifies it. (Sales / OTPs are tracked separately.)</p>
           ${teams.length ? "" : `<p class="pp-warn">No teams are set up yet - ask an admin.</p>`}
           <form id="submit-form" class="pp-form" ${teams.length ? "" : "hidden"}>
             <div class="pp-form-grid">
@@ -53,9 +53,9 @@
                   ${teams.map(t => `<option value="${t.id}" ${defaultTeam && defaultTeam.id === t.id ? "selected" : ""}>${escapeHtml(t.name)}</option>`).join("")}
                 </select>
               </label>
-              <label>Deal type
+              <label>Mandate type
                 <select name="deal_type" required>
-                  ${POINTS.TYPES.map(t => `<option value="${t.key}">${escapeHtml(t.label)}</option>`).join("")}
+                  ${POINTS.MANDATE_TYPES.map(t => `<option value="${t.key}">${escapeHtml(t.label)}</option>`).join("")}
                 </select>
               </label>
               <label>Value (R)
@@ -65,6 +65,10 @@
                 <input name="signed_date" type="date">
               </label>
             </div>
+            <label class="pp-file-label">Signed mandate document <span class="pp-req">required</span>
+              <input name="doc" type="file" accept="application/pdf,image/*" required>
+              <span class="pp-file-hint">PDF or a clear photo of the fully signed mandate.</span>
+            </label>
             <div class="pp-form-foot">
               <div class="pp-preview">Worth <strong id="sub-pts">0</strong> points once verified <span id="sub-bracket" class="muted"></span></div>
               <button type="submit" class="btn-primary" id="sub-submit">Submit for verification</button>
@@ -138,20 +142,27 @@
       const $btn = $view.querySelector("#sub-submit");
       const fd = new FormData($form);
       const value = Number(String(fd.get("value_rand") || "").replace(/[^\d]/g, ""));
+      const file = ($form.querySelector('[name="doc"]').files || [])[0];
       if (!fd.get("team_id") || !value) { window.toast({ title: "Team and value are required", ms: 3000 }); return; }
-      $btn.disabled = true; $btn.textContent = "Submitting…";
+      if (!file) { window.toast({ title: "Attach the signed mandate document", ms: 3500 }); return; }
+      if (file.size > 15 * 1024 * 1024) { window.toast({ title: "File too large", body: "Please keep it under 15 MB.", ms: 4000 }); return; }
+      $btn.disabled = true; $btn.textContent = "Uploading…";
       try {
+        const doc = await DATA.uploadMandateDoc(file, user);
+        $btn.textContent = "Submitting…";
         await DATA.submitEntry({
           team_id: Number(fd.get("team_id")),
           deal_type: fd.get("deal_type"),
           value_rand: value,
           signed_date: fd.get("signed_date") || null,
+          document_path: doc.path,
+          document_name: doc.name,
           submitted_by: user.username,
           submitted_by_name: user.name,
           created_by: user.username,
           created_by_name: user.name,
         });
-        window.toast({ title: "Submitted for verification ✓", body: "Front office will confirm it soon.", ms: 4000 });
+        window.toast({ title: "Submitted for verification ✓", body: "Front office will review the mandate soon.", ms: 4000 });
         await rerender($view, user);
       } catch (err) {
         window.toast({ title: "Could not submit", body: escapeHtml(err.message || String(err)), ms: 6000 });

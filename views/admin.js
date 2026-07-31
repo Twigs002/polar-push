@@ -61,7 +61,7 @@
               </label>
               <label>Deal type
                 <select name="deal_type" required>
-                  ${POINTS.TYPES.map(t => `<option value="${t.key}">${escapeHtml(t.label)}</option>`).join("")}
+                  ${POINTS.MANDATE_TYPES.map(t => `<option value="${t.key}">${escapeHtml(t.label)}</option>`).join("")}
                 </select>
               </label>
               <label>Value (R)
@@ -127,7 +127,7 @@
       <table class="pp-entries pp-pending-table">
         <thead><tr>
           <th>Team</th><th>Type</th><th class="num">Value</th><th class="num">Pts</th>
-          <th>Signed</th><th>Submitted by</th><th>Ref</th><th></th>
+          <th>Signed</th><th>Submitted by</th><th>Mandate</th><th></th>
         </tr></thead>
         <tbody>
           ${entries.map(e => `
@@ -138,7 +138,9 @@
               <td class="num"><strong>${e.points}</strong></td>
               <td>${escapeHtml(fmtDate(e.signed_date))}</td>
               <td>${escapeHtml(e.submitted_by_name || e.agent_name || "")}</td>
-              <td title="${escapeAttr(e.reference || "")}">${escapeHtml(UTILS.trunc(e.reference || "", 16) || "")}</td>
+              <td>${e.document_path
+                    ? `<button class="pp-mini pp-doc" data-doc="${escapeAttr(e.document_path)}" title="Open the signed mandate">📄 View</button>`
+                    : `<span class="muted small">none</span>`}</td>
               <td class="pp-actions">
                 <button class="pp-mini pp-approve" data-verify="${e.id}" title="Verify - counts toward standings">✓ Verify</button>
                 <button class="pp-mini pp-danger" data-reject="${e.id}" title="Reject submission">Reject</button>
@@ -155,7 +157,7 @@
       <table class="pp-entries">
         <thead><tr>
           <th>Team</th><th>Type</th><th class="num">Value</th><th class="num">Pts</th>
-          <th>Signed</th><th>Agent</th><th>Status</th><th></th>
+          <th>Signed</th><th>Agent</th><th>Doc</th><th>Status</th><th></th>
         </tr></thead>
         <tbody>
           ${entries.map(e => `
@@ -166,6 +168,7 @@
               <td class="num"><strong>${(e.status === "verified" && !e.voided) ? e.points : "0"}</strong>${(e.voided || e.status === "rejected") ? `<span class="pp-strike">${e.points}</span>` : ""}</td>
               <td>${escapeHtml(fmtDate(e.signed_date))}</td>
               <td>${escapeHtml(e.agent_name || e.submitted_by_name || "")}</td>
+              <td>${e.document_path ? `<button class="pp-mini pp-doc" data-doc="${escapeAttr(e.document_path)}" title="Open the signed mandate">📄</button>` : ""}</td>
               <td>${statusPill(e)}</td>
               <td class="pp-actions">
                 ${e.status === "verified" ? `<button class="pp-mini" data-void="${e.id}" data-cur="${e.voided ? 1 : 0}" title="${e.voided ? "Restore points" : "Void - deal fell through"}">${e.voided ? "↺ Restore" : "Void"}</button>` : ""}
@@ -244,6 +247,20 @@
       const btn = e.target.closest("button");
       if (!btn) return;
 
+      if (btn.dataset.doc) {
+        const orig = btn.textContent;
+        btn.disabled = true; btn.textContent = "Opening…";
+        try {
+          const url = await DATA.mandateDocUrl(btn.dataset.doc);
+          if (url) window.open(url, "_blank", "noopener");
+          else window.toast({ title: "No document on file", ms: 3000 });
+        } catch (err) {
+          window.toast({ title: "Could not open document", body: escapeHtml(err.message || String(err)), ms: 5000 });
+        } finally {
+          btn.disabled = false; btn.textContent = orig;
+        }
+        return;
+      }
       if (btn.dataset.verify) {
         await guard(btn, () => DATA.verifyEntry(btn.dataset.verify, user), $view, user, "Deal verified");
         return;

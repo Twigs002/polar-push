@@ -28,6 +28,9 @@ window.POINTS = (() => {
     { key: "lease", base: 4, label: "Lease",                 group: "Sales" },
   ];
   const BY_KEY = Object.fromEntries(TYPES.map(t => [t.key, t]));
+  // Only mandates are submitted through the portal. Sales (OTP / lease) are
+  // tracked separately off a Google Sheet.
+  const MANDATE_TYPES = TYPES.filter(t => t.group === "Mandates");
 
   function bracket(valueRand) {
     const v = Math.max(0, Number(valueRand) || 0);
@@ -56,5 +59,5 @@ window.POINTS = (() => {
     return (BY_KEY[dealType] || {}).group || "Other";
   }
 
-  return { TYPES, BY_KEY, BRACKET_SIZE, bracket, points, bracketLabel, typeLabel, typeGroup };
+  return { TYPES, MANDATE_TYPES, BY_KEY, BRACKET_SIZE, bracket, points, bracketLabel, typeLabel, typeGroup };
 })();

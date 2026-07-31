@@ -92,6 +92,31 @@ window.DATA = (() => {
 
   function invalidate() { _cache = null; }
 
+  // ── Mandate document upload / retrieval (Supabase Storage) ──────────────
+  const MANDATE_BUCKET = "polar-mandates";
+
+  async function uploadMandateDoc(file, user) {
+    if (!file) throw new Error("No file selected");
+    const ext = (file.name.split(".").pop() || "dat").toLowerCase().replace(/[^a-z0-9]/g, "");
+    const stamp = Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+    const path = `${(user && user.username) || "anon"}/${stamp}.${ext}`;
+    const { data, error } = await client().storage
+      .from(MANDATE_BUCKET)
+      .upload(path, file, { upsert: false, contentType: file.type || undefined });
+    if (error) throw error;
+    return { path: data.path, name: file.name };
+  }
+
+  // Short-lived signed URL so an admin can open the document to verify it.
+  async function mandateDocUrl(path) {
+    if (!path) return null;
+    const { data, error } = await client().storage
+      .from(MANDATE_BUCKET)
+      .createSignedUrl(path, 3600);
+    if (error) throw error;
+    return data.signedUrl;
+  }
+
   // ── Broker submission (any active staff; lands as 'pending') ────────────
   async function submitEntry(entry) {
     const { points, ...rest } = entry;
@@ -174,6 +199,7 @@ window.DATA = (() => {
 
   return {
     client, signIn, signOut, getSession, loadAll, invalidate,
+    uploadMandateDoc, mandateDocUrl,
     submitEntry, addEntry, verifyEntry, rejectEntry,
     updateEntry, setEntryVoided, deleteEntry,
     addTeam, updateTeam, deleteTeam,
