@@ -749,18 +749,18 @@ table.dt td.num, table.dt th.num { text-align: right; font-variant-numeric: tabu
 .pp-prize-label {
   font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
   font-size: 11px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase;
-  color: rgba(62,91,166,0.75);
+  color: rgba(255,255,255,0.85);
 }
 .pp-prize-desc {
   font-family: var(--serif); font-size: 24px; line-height: 1.15; font-weight: 700;
-  color: var(--blue-800); letter-spacing: -.02em;
+  color: #fff; letter-spacing: -.02em;
 }
 .pp-prize-value {
   display: flex; align-items: baseline; gap: 8px; margin-top: 6px;
-  padding-top: 12px; border-top: 1px solid rgba(62,91,166,0.25);
+  padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.4);
 }
-.pp-prize-amount { font-family: var(--serif); font-size: 30px; font-weight: 800; color: var(--blue-800); }
-.pp-prize-unit { font-size: 13px; font-weight: 600; color: rgba(62,91,166,0.8); }
+.pp-prize-amount { font-family: var(--serif); font-size: 30px; font-weight: 800; color: #fff; }
+.pp-prize-unit { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.9); }
 
 /* ── KPI tiles (dashboard-v2 .kpi) ────────────────────────────────────── */
 .pp-kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 22px; }
