@@ -31,6 +31,9 @@
         <button type="submit" class="btn-primary">Sign in</button>
         <div id="login-error" class="error" hidden></div>
       </form>
+      <p class="sub" style="margin:18px 0 0;text-align:center">
+        <a id="login-back" href="#/leaderboard" style="color:var(--sky);font-weight:600">← View the leaderboard</a>
+      </p>
     </div>
   </div>
 
@@ -44,13 +47,15 @@
       </div>
       <nav class="tabs">
         <a href="#/leaderboard" data-tab="leaderboard">Leaderboard</a>
-        <a href="#/submit"      data-tab="submit">Submit a mandate</a>
+        <a href="#/otps"        data-tab="otps">OTP Tracking</a>
         <a href="#/scoring"     data-tab="scoring">Scoring</a>
+        <a href="#/submit"      data-tab="submit">Submit a mandate</a>
         <a href="#/admin"       data-tab="admin" data-editor="1" hidden>Admin</a>
       </nav>
       <div class="user-chip">
         <span id="user-label" class="muted"></span>
-        <button id="signout" class="btn-ghost">Sign out</button>
+        <button id="signin" class="btn-ghost" hidden>Sign in</button>
+        <button id="signout" class="btn-ghost" hidden>Sign out</button>
       </div>
     </header>
 
@@ -68,6 +73,7 @@
   <script defer src="points.js"></script>
   <script defer src="data.js"></script>
   <script defer src="views/leaderboard.js"></script>
+  <script defer src="views/otps.js"></script>
   <script defer src="views/submit.js"></script>
   <script defer src="views/scoring.js"></script>
   <script defer src="views/admin.js"></script>

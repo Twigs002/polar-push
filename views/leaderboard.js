@@ -2,24 +2,16 @@
 (function () {
   const { escapeHtml } = UTILS;
 
+  // Standings come from the aggregate `polar_push_standings` view (public,
+  // no deal-level detail), so the scoreboard works without a PIN.
   function computeStandings(cache) {
-    const byTeam = new Map();
-    for (const t of cache.teams) {
-      byTeam.set(t.id, {
-        id: t.id, name: t.name, active: t.active, sort_order: t.sort_order,
-        total: 0, mandates: 0, sales: 0, entries: 0,
-      });
-    }
-    for (const e of cache.entries) {
-      const row = byTeam.get(e.team_id);
-      if (!row) continue;
-      if (e.status !== "verified" || e.voided) continue;
-      row.entries += 1;
-      row.total += Number(e.points) || 0;
-      if (["sole", "dual", "open"].includes(e.deal_type)) row.mandates += 1;
-      else row.sales += 1;
-    }
-    const rows = [...byTeam.values()];
+    const rows = (cache.standings || []).map(s => ({
+      id: s.team_id, name: s.team, active: s.active, sort_order: s.sort_order,
+      total: Number(s.total_points) || 0,
+      mandates: Number(s.mandate_count) || 0,
+      sales: Number(s.sale_count) || 0,
+      entries: Number(s.entry_count) || 0,
+    }));
     rows.sort((a, b) => b.total - a.total || a.name.localeCompare(b.name));
     // Dense rank so tied teams share a place.
     let place = 0, lastPts = null;
@@ -72,7 +64,7 @@
       $view.innerHTML = setupNotice(user);
       return;
     }
-    if (!cache.teams.length) {
+    if (!(cache.standings || []).length) {
       $view.innerHTML = `<div class="empty-state"><div class="empty-state-icon">🏔️</div>
         <p>No teams yet.${user.isEditor ? " Add the competing teams from the <a href='#/admin'>Admin</a> tab." : " Ask an admin to set up the teams."}</p></div>`;
       return;
@@ -82,8 +74,8 @@
     const tl = timeline();
     const leader = rows[0];
     const maxPts = Math.max(1, ...rows.map(r => r.total));
-    const totalEntries = cache.entries.filter(e => e.status === "verified" && !e.voided).length;
-    const pendingCount = cache.entries.filter(e => e.status === "pending").length;
+    const totalEntries = rows.reduce((n, r) => n + r.entries, 0);
+    const pendingCount = (cache.standings || []).reduce((n, s) => n + (Number(s.pending_count) || 0), 0);
 
     const podium = rows.slice(0, 3);
 

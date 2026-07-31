@@ -92,6 +92,37 @@ window.DATA = (() => {
 
   function invalidate() { _cache = null; }
 
+  // Public aggregate standings (the leaderboard reads this; anon-readable via
+  // a grant on the view, so no PIN is needed to watch the scoreboard).
+  let _standings = null;
+  async function loadStandings(force = false) {
+    if (_standings && !force) return _standings;
+    try {
+      const rows = await _allRows("polar_push_standings", { col: "total_points", asc: false });
+      _standings = { ready: true, standings: rows };
+    } catch (e) {
+      if (_missingTable(e)) { _standings = { ready: false, standings: [] }; }
+      else throw e;
+    }
+    return _standings;
+  }
+
+  // Public OTP list (team, acceptance date, amount, points) for the OTP
+  // tracking view. Anon-readable via a grant on the view.
+  let _otps = null;
+  async function loadOtps(force = false) {
+    if (_otps && !force) return _otps;
+    try {
+      const rows = await _allRows("polar_push_otps_public", { col: "acceptance_date", asc: false });
+      _otps = { ready: true, otps: rows, at: new Date() };
+    } catch (e) {
+      if (_missingTable(e)) { _otps = { ready: false, otps: [], at: new Date() }; }
+      else throw e;
+    }
+    return _otps;
+  }
+  function invalidateOtps() { _otps = null; }
+
   // ── Mandate document upload / retrieval (Supabase Storage) ──────────────
   const MANDATE_BUCKET = "polar-mandates";
 
@@ -199,6 +230,7 @@ window.DATA = (() => {
 
   return {
     client, signIn, signOut, getSession, loadAll, invalidate,
+    loadStandings, loadOtps, invalidateOtps,
     uploadMandateDoc, mandateDocUrl,
     submitEntry, addEntry, verifyEntry, rejectEntry,
     updateEntry, setEntryVoided, deleteEntry,

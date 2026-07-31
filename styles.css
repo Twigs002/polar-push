@@ -1076,3 +1076,11 @@ table.dt td.num, table.dt th.num { text-align: right; font-variant-numeric: tabu
   .pp-prize-amount { font-size: 26px; }
   .brand-name { display: none; }                 /* logo + bolt is enough */
 }
+
+/* OTP tracking view */
+.pp-otp-empty { text-align: center; padding: 26px 10px; color: var(--muted); }
+#otp-refresh { display: inline-flex; align-items: center; gap: 6px; }
+.pp-spin { opacity: .7; }
+.pp-spin::before { content: ""; }
+@keyframes pp-spin-kf { to { transform: rotate(360deg); } }
+#otp-refresh.pp-spin { animation: pp-spin-kf .8s linear infinite; }

@@ -64,6 +64,9 @@
               <label>Signed date
                 <input name="signed_date" type="date">
               </label>
+              <label>Your name <span class="pp-req">required</span>
+                <input name="submitter" type="text" value="${escapeAttr((user && user.name) || "")}" placeholder="Who's submitting" required>
+              </label>
               <label class="pp-span-2">Property address <span class="pp-req">required</span>
                 <input name="property_address" type="text" placeholder="e.g. 12 Beach Road, Sea Point" required>
               </label>
@@ -79,7 +82,7 @@
           </form>
         </div>
 
-        <div class="pp-card">
+        <div class="pp-card" ${user && user.username ? "" : "hidden"}>
           <div class="pp-card-head">
             <h2>My submissions</h2>
             <span class="muted small">${mySubs.length ? `${mySubs.length} shown` : ""}</span>
@@ -146,8 +149,10 @@
       const fd = new FormData($form);
       const value = Number(String(fd.get("value_rand") || "").replace(/[^\d]/g, ""));
       const address = (fd.get("property_address") || "").trim();
+      const submitter = (fd.get("submitter") || "").trim();
       const file = ($form.querySelector('[name="doc"]').files || [])[0];
       if (!fd.get("team_id") || !value) { window.toast({ title: "Team and value are required", ms: 3000 }); return; }
+      if (!submitter) { window.toast({ title: "Your name is required", ms: 3000 }); return; }
       if (!address) { window.toast({ title: "Property address is required", ms: 3000 }); return; }
       if (!file) { window.toast({ title: "Attach the signed mandate document", ms: 3500 }); return; }
       if (file.size > 15 * 1024 * 1024) { window.toast({ title: "File too large", body: "Please keep it under 15 MB.", ms: 4000 }); return; }
@@ -167,10 +172,11 @@
           property_address: address,
           document_path: doc.path,
           document_name: label,
-          submitted_by: user.username,
-          submitted_by_name: user.name,
-          created_by: user.username,
-          created_by_name: user.name,
+          agent_name: submitter,
+          submitted_by: (user && user.username) || null,
+          submitted_by_name: submitter,
+          created_by: (user && user.username) || null,
+          created_by_name: submitter,
         });
         window.toast({ title: "Submitted for verification ✓", body: "Front office will review the mandate soon.", ms: 4000 });
         await rerender($view, user);
