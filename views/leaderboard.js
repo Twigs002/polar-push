@@ -1,4 +1,4 @@
-// Leaderboard — the competition scoreboard. Readable by all staff.
+// Leaderboard - the competition scoreboard. Readable by all staff.
 (function () {
   const { escapeHtml } = UTILS;
 
@@ -91,7 +91,7 @@
       <section class="pp-banner">
         <div class="pp-banner-ic" aria-hidden="true">⚡❄️</div>
         <div class="pp-banner-body">
-          <div class="pp-eyebrow">Operation · ${fmtDay(new Date(POLAR.START + "T00:00:00"))} – ${fmtDay(new Date(POLAR.END + "T00:00:00"))} 2026</div>
+          <div class="pp-eyebrow">Operation · ${fmtDay(new Date(POLAR.START + "T00:00:00"))} - ${fmtDay(new Date(POLAR.END + "T00:00:00"))} 2026</div>
           <div class="pp-banner-title">Polar&nbsp;Push</div>
           <div class="pp-banner-prize">🏆 ${escapeHtml(POLAR.PRIZE)}</div>
         </div>
@@ -103,7 +103,7 @@
       </section>
 
       <div class="pp-kpis">
-        ${kpiTile("🏆", "Leading team", leader && leader.total > 0 ? escapeHtml(leader.name) : "—", leader && leader.total > 0 ? `${leader.total} pts` : "all to play for")}
+        ${kpiTile("🏆", "Leading team", leader && leader.total > 0 ? escapeHtml(leader.name) : "-", leader && leader.total > 0 ? `${leader.total} pts` : "all to play for")}
         ${kpiTile("✅", "Verified deals", String(totalEntries), "counting toward points")}
         ${kpiTile("👥", "Teams", String(rows.length), "in the running")}
         ${pendingCount
@@ -116,7 +116,7 @@
       <section class="pp-board">
         <div class="pp-board-head">
           <h2>Standings</h2>
-          ${leader && leader.total > 0 ? `<span class="pp-leader-note">${escapeHtml(leader.name)} out front${leader.total ? ` · ${leader.total} pts` : ""}</span>` : `<span class="pp-leader-note muted">No points on the board yet — it's all to play for.</span>`}
+          ${leader && leader.total > 0 ? `<span class="pp-leader-note">${escapeHtml(leader.name)} out front${leader.total ? ` · ${leader.total} pts` : ""}</span>` : `<span class="pp-leader-note muted">No points on the board yet - it's all to play for.</span>`}
         </div>
         <div class="pp-rows">
           ${rows.map(r => rowHtml(r, maxPts)).join("")}

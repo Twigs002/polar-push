@@ -13,7 +13,7 @@ Winning team takes a fully paid weekend away worth R15 000.
                           │
 ┌──────────────────────────────────────────────────────────────┐
 │  Browser                                                       │
-│   • Sign in (Supabase Auth — clock-in username + PIN)          │
+│   • Sign in (Supabase Auth - clock-in username + PIN)          │
 │   • Leaderboard: live team standings (verified deals only)     │
 │   • Submit a deal: any broker logs a mandate / sale → pending  │
 │   • Scoring: rules table + live points calculator              │
@@ -23,7 +23,7 @@ Winning team takes a fully paid weekend away worth R15 000.
                           │  HTTPS + JWT (RLS on every table)
                           │
 ┌──────────────────────────────────────────────────────────────┐
-│  Supabase (dqszbqiimbfvmmnpgpsb — shared with quay-clock)      │
+│  Supabase (dqszbqiimbfvmmnpgpsb - shared with quay-clock)      │
 │   staff                ← existing auth + roles                 │
 │   polar_push_teams     ← competing teams                       │
 │   polar_push_entries   ← one row per mandate/sale (verified)   │
@@ -36,7 +36,7 @@ Winning team takes a fully paid weekend away worth R15 000.
 Points step up one bracket every **R5 million** of deal value
 (`bracket = floor(value / 5m) + 1`), multiplied by a base per deal type:
 
-| Deal type                        | Base | Under R5m | R5–10m | R10–15m | R15m+ |
+| Deal type                        | Base | Under R5m | R5-10m | R10-15m | R15m+ |
 |----------------------------------|------|-----------|--------|---------|-------|
 | Sole mandate                     | 2    | 2         | 4      | 6       | 8 (+2/R5m) |
 | Dual mandate / Signed open       | 1    | 1         | 2      | 3       | 4 (+1/R5m) |
@@ -75,9 +75,9 @@ Roles come from the shared `staff` table (`is_super` / `is_admin`), same as
 1. **Run the migration** against the Supabase project:
    `supabase/migrations/2026-07-31_polar_push.sql`
    (creates the tables, the `points` generated column, the standings view, and RLS).
-2. **Seed the teams** — either via the Admin tab in-app, or uncomment the seed
+2. **Seed the teams** - either via the Admin tab in-app, or uncomment the seed
    block at the bottom of the migration.
-3. **GitHub Pages** — served from the repo root on the default branch.
+3. **GitHub Pages** - served from the repo root on the default branch.
 
 No secrets in the repo: the Supabase URL + anon key are public by design;
 all access is gated by Postgres RLS.

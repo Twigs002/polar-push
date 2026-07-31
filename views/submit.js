@@ -1,4 +1,4 @@
-// Submit a deal — any broker logs a mandate / sale for their team.
+// Submit a deal - any broker logs a mandate / sale for their team.
 // Submissions land as 'pending' and only count once an admin verifies them.
 (function () {
   const { escapeHtml, escapeAttr } = UTILS;
@@ -44,7 +44,7 @@
         <div class="pp-card pp-entry-card">
           <h2>Submit a mandate or sale</h2>
           <p class="muted">Log your deal here and it goes to front office for verification. It only earns points once an admin confirms it's signed and complete.</p>
-          ${teams.length ? "" : `<p class="pp-warn">No teams are set up yet — ask an admin.</p>`}
+          ${teams.length ? "" : `<p class="pp-warn">No teams are set up yet - ask an admin.</p>`}
           <form id="submit-form" class="pp-form" ${teams.length ? "" : "hidden"}>
             <div class="pp-form-grid">
               <label>Team
@@ -64,16 +64,7 @@
               <label>Signed date
                 <input name="signed_date" type="date">
               </label>
-              <label>Agent <span class="opt">(optional)</span>
-                <input name="agent_name" type="text" value="${escapeAttr(user.name || "")}" placeholder="Who earned it">
-              </label>
-              <label>Reference <span class="opt">(optional)</span>
-                <input name="reference" type="text" placeholder="Property / deal ref">
-              </label>
             </div>
-            <label class="pp-notes">Notes <span class="opt">(optional)</span>
-              <input name="notes" type="text" placeholder="Anything front office should know">
-            </label>
             <div class="pp-form-foot">
               <div class="pp-preview">Worth <strong id="sub-pts">0</strong> points once verified <span id="sub-bracket" class="muted"></span></div>
               <button type="submit" class="btn-primary" id="sub-submit">Submit for verification</button>
@@ -94,7 +85,7 @@
   }
 
   function mySubsTable(subs, teams) {
-    const teamName = id => (teams.find(t => t.id === id) || {}).name || "—";
+    const teamName = id => (teams.find(t => t.id === id) || {}).name || "-";
     return `<div class="pp-table-wrap">
       <table class="pp-entries">
         <thead><tr>
@@ -105,12 +96,12 @@
           ${subs.map(e => {
             const st = STATUS[e.status] || STATUS.pending;
             const note = e.status === "rejected" && e.reject_reason ? `<div class="pp-sub-note">${escapeHtml(e.reject_reason)}</div>`
-              : e.voided ? `<div class="pp-sub-note">Voided — deal fell through</div>` : "";
+              : e.voided ? `<div class="pp-sub-note">Voided - deal fell through</div>` : "";
             return `<tr class="${e.voided ? "pp-voided" : ""}">
               <td>${escapeHtml(teamName(e.team_id))}</td>
               <td>${escapeHtml(POINTS.typeLabel(e.deal_type))}</td>
               <td class="num">${money(e.value_rand)}</td>
-              <td class="num"><strong>${(e.status === "verified" && !e.voided) ? e.points : "—"}</strong></td>
+              <td class="num"><strong>${(e.status === "verified" && !e.voided) ? e.points : "-"}</strong></td>
               <td>${escapeHtml(fmtDate(e.signed_date))}</td>
               <td><span class="pp-status ${st.cls}">${st.label}</span>${note}</td>
             </tr>`;
@@ -155,9 +146,6 @@
           deal_type: fd.get("deal_type"),
           value_rand: value,
           signed_date: fd.get("signed_date") || null,
-          agent_name: (fd.get("agent_name") || "").trim() || null,
-          reference: (fd.get("reference") || "").trim() || null,
-          notes: (fd.get("notes") || "").trim() || null,
           submitted_by: user.username,
           submitted_by_name: user.name,
           created_by: user.username,

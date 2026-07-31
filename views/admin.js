@@ -1,4 +1,4 @@
-// Admin — add verified deals, void/delete entries, manage teams.
+// Admin - add verified deals, void/delete entries, manage teams.
 // Super/admin only (RLS also enforces this server-side).
 (function () {
   const { escapeHtml, escapeAttr } = UTILS;
@@ -120,9 +120,9 @@
     return `<span class="pp-status pp-st-pending">Pending</span>`;
   }
 
-  // Pending queue — the action-first table an admin verifies from.
+  // Pending queue - the action-first table an admin verifies from.
   function pendingTable(entries, teams) {
-    const teamName = id => (teams.find(t => t.id === id) || {}).name || "—";
+    const teamName = id => (teams.find(t => t.id === id) || {}).name || "-";
     return `<div class="pp-table-wrap">
       <table class="pp-entries pp-pending-table">
         <thead><tr>
@@ -140,7 +140,7 @@
               <td>${escapeHtml(e.submitted_by_name || e.agent_name || "")}</td>
               <td title="${escapeAttr(e.reference || "")}">${escapeHtml(UTILS.trunc(e.reference || "", 16) || "")}</td>
               <td class="pp-actions">
-                <button class="pp-mini pp-approve" data-verify="${e.id}" title="Verify — counts toward standings">✓ Verify</button>
+                <button class="pp-mini pp-approve" data-verify="${e.id}" title="Verify - counts toward standings">✓ Verify</button>
                 <button class="pp-mini pp-danger" data-reject="${e.id}" title="Reject submission">Reject</button>
               </td>
             </tr>`).join("")}
@@ -150,7 +150,7 @@
   }
 
   function entriesTable(entries, teams) {
-    const teamName = id => (teams.find(t => t.id === id) || {}).name || "—";
+    const teamName = id => (teams.find(t => t.id === id) || {}).name || "-";
     return `<div class="pp-table-wrap">
       <table class="pp-entries">
         <thead><tr>
@@ -168,7 +168,7 @@
               <td>${escapeHtml(e.agent_name || e.submitted_by_name || "")}</td>
               <td>${statusPill(e)}</td>
               <td class="pp-actions">
-                ${e.status === "verified" ? `<button class="pp-mini" data-void="${e.id}" data-cur="${e.voided ? 1 : 0}" title="${e.voided ? "Restore points" : "Void — deal fell through"}">${e.voided ? "↺ Restore" : "Void"}</button>` : ""}
+                ${e.status === "verified" ? `<button class="pp-mini" data-void="${e.id}" data-cur="${e.voided ? 1 : 0}" title="${e.voided ? "Restore points" : "Void - deal fell through"}">${e.voided ? "↺ Restore" : "Void"}</button>` : ""}
                 ${e.status === "rejected" ? `<button class="pp-mini pp-approve" data-verify="${e.id}" title="Verify after all">✓ Verify</button>` : ""}
                 <button class="pp-mini pp-danger" data-del="${e.id}" title="Delete permanently">✕</button>
               </td>
@@ -283,7 +283,7 @@
           window.toast({ title: "Team deleted", ms: 2500 });
           await rerender($view, user);
         } catch (err) {
-          window.toast({ title: "Could not delete team", body: "It probably has deals logged — deactivate it instead.", ms: 5000 });
+          window.toast({ title: "Could not delete team", body: "It probably has deals logged - deactivate it instead.", ms: 5000 });
         }
         return;
       }

@@ -1,4 +1,4 @@
-// Shared utilities — used across views.
+// Shared utilities - used across views.
 window.UTILS = (() => {
   function escapeHtml(s) {
     return String(s == null ? "" : s).replace(/[&<>"']/g, c => ({
@@ -39,7 +39,7 @@ window.UTILS = (() => {
     return future ? `in ${unit}` : `${unit} ago`;
   }
 
-  function pct(n, d) { return d ? `${(n / d * 100).toFixed(1)}%` : "—"; }
+  function pct(n, d) { return d ? `${(n / d * 100).toFixed(1)}%` : "-"; }
 
   // Empty-state HTML when filters return zero rows
   function emptyState(message = "No leads match the current filters.") {

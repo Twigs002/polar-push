@@ -1,11 +1,11 @@
-// How scoring works — rules table + a live calculator. Readable by all staff.
+// How scoring works - rules table + a live calculator. Readable by all staff.
 (function () {
   const { escapeHtml } = UTILS;
 
   const BRACKETS = [
     { label: "Under R5m", mult: 1 },
-    { label: "R5m – R10m", mult: 2 },
-    { label: "R10m – R15m", mult: 3 },
+    { label: "R5m - R10m", mult: 2 },
+    { label: "R10m - R15m", mult: 3 },
     { label: "R15m+", mult: 4, note: "+1 bracket every extra R5m" },
   ];
 
@@ -19,7 +19,7 @@
         <div class="pp-card">
           <h2>How points are earned</h2>
           <p class="muted">Points step up one full bracket for every <strong>R5 million</strong> of deal value.
-            A mandate or sale only counts once it's been submitted to front office and properly signed —
+            A mandate or sale only counts once it's been submitted to front office and properly signed -
             missing signatures, initials or dates mean it won't be verified. Deals that later fall through have their points deducted.</p>
 
           <div class="pp-table-wrap">

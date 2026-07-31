@@ -1,4 +1,4 @@
-/* Quay 1 — Seller Leads (Pages edition)
+/* Quay 1 - Seller Leads (Pages edition)
    Design tokens mirror quay-dashboard-v2 */
 
 :root {
@@ -537,7 +537,7 @@ table.dt tbody tr:focus-visible,
 .kpi .delta.flat  { color: var(--muted);       background: var(--paper); }
 .kpi .spark { margin-top: 8px; height: 36px; }
 .kpi .delta:not(.up):not(.down):not(.flat) {
-  /* Plain percentage like "53.0%" (no comparison) — uses default brand colour */
+  /* Plain percentage like "53.0%" (no comparison) - uses default brand colour */
   background: transparent;
   color: var(--blue-800);
   padding: 0;
@@ -685,8 +685,8 @@ table.dt td.num, table.dt th.num { text-align: right; font-variant-numeric: tabu
 
 
 /* ══════════════════════════════════════════════════════════════════════
-   Operation Polar Push — styling aligned to quay-dashboard-v2
-   (Montserrat 600–700 headings, sky-tint KPI tiles, --r-lg cards,
+   Operation Polar Push - styling aligned to quay-dashboard-v2
+   (Montserrat 600-700 headings, sky-tint KPI tiles, --r-lg cards,
    navy-gradient banner modelled on .avg-output-banner)
    ══════════════════════════════════════════════════════════════════════ */
 
@@ -705,7 +705,7 @@ table.dt td.num, table.dt th.num { text-align: right; font-variant-numeric: tabu
   display: flex; align-items: center; gap: 20px;
   padding: 22px 26px; margin-bottom: 20px;
   border-radius: var(--r-lg);
-  background: linear-gradient(100deg, var(--blue-900), var(--blue-800));
+  background: var(--blue-900);
   color: #fff; border: none; box-shadow: var(--shadow);
 }
 .pp-banner-ic {
@@ -737,7 +737,7 @@ table.dt td.num, table.dt th.num { text-align: right; font-variant-numeric: tabu
 .pp-progress { height: 7px; border-radius: 999px; overflow: hidden; background: rgba(255,255,255,.18); }
 .pp-progress-fill {
   height: 100%; border-radius: 999px;
-  background: linear-gradient(90deg, var(--sky), var(--yellow));
+  background: var(--yellow);
   transition: width .6s ease;
 }
 .pp-clock-sub { margin-top: 8px; font-size: 12px; color: var(--on-navy, #E8EDF7); opacity: .85; }

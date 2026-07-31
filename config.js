@@ -1,4 +1,4 @@
-// Public Supabase config — same project as quay-clock + quay-leads.
+// Public Supabase config - same project as quay-clock + quay-leads.
 // Both values are intended to be public. Row-level access is gated by
 // Postgres RLS on every table (any active staff may read standings;
 // only super/admin staff may write entries).
@@ -8,7 +8,7 @@ window.QUAY = {
   AUTH_EMAIL_DOMAIN: "quay1.local",
 };
 
-// Operation Polar Push — 8-week team competition.
+// Operation Polar Push - 8-week team competition.
 window.POLAR = {
   TITLE: "Operation Polar Push",
   SUBTITLE: "8-week team competition",

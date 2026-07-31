@@ -9,7 +9,7 @@
   const $signout = document.getElementById("signout");
   const $view = document.getElementById("view");
 
-  // Global toast — title/body are trusted HTML; callers escape dynamic bits.
+  // Global toast - title/body are trusted HTML; callers escape dynamic bits.
   window.toast = function ({ title, body = "", ms = 4000 }) {
     const t = document.createElement("div");
     t.className = "toast";

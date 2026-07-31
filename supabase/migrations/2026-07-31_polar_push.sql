@@ -1,8 +1,8 @@
--- Operation Polar Push — 8-week team competition scoreboard.
+-- Operation Polar Push - 8-week team competition scoreboard.
 -- =================================================================
 -- Two tables:
---   polar_push_teams   — the competing teams (drives the standings + dropdown)
---   polar_push_entries — one row per verified mandate / sale
+--   polar_push_teams   - the competing teams (drives the standings + dropdown)
+--   polar_push_entries - one row per verified mandate / sale
 --
 -- Points are computed authoritatively by a GENERATED column so the score
 -- can never drift from the client. The client (points.js) mirrors the same

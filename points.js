@@ -1,4 +1,4 @@
-// Operation Polar Push — scoring engine (single source of truth on the client).
+// Operation Polar Push - scoring engine (single source of truth on the client).
 // Mirrors the `points` GENERATED column in the Supabase migration exactly.
 //
 // Rules (from the competition brief):
@@ -40,12 +40,12 @@ window.POINTS = (() => {
     return t.base * bracket(valueRand);
   }
 
-  // "R5m–R10m" style label for the bracket a value falls into.
+  // "R5m-R10m" style label for the bracket a value falls into.
   function bracketLabel(valueRand) {
     const b = bracket(valueRand);
     const lo = (b - 1) * 5;
     const hi = b * 5;
-    return b === 1 ? "Under R5m" : `R${lo}m–R${hi}m`;
+    return b === 1 ? "Under R5m" : `R${lo}m-R${hi}m`;
   }
 
   function typeLabel(dealType) {

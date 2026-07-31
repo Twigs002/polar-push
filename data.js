@@ -52,7 +52,7 @@ window.DATA = (() => {
     return userFromStaff(staff, data.session.user.email);
   }
 
-  // PostgREST caps at 1000 rows/request — page through everything.
+  // PostgREST caps at 1000 rows/request - page through everything.
   async function _allRows(table, order) {
     const sb = client();
     const PAGE = 1000;
@@ -103,7 +103,7 @@ window.DATA = (() => {
 
   // ── Admin mutations (super/admin only; RLS enforces server-side) ────────
   async function addEntry(entry) {
-    // points is a GENERATED column — never sent from the client.
+    // points is a GENERATED column - never sent from the client.
     // Admin direct-adds are verified immediately.
     const { points, ...rest } = entry;
     const { error } = await client().from("polar_push_entries")
