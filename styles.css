@@ -743,7 +743,7 @@ table.dt td.num, table.dt th.num { text-align: right; font-variant-numeric: tabu
   transition: width .6s ease;
 }
 .pp-banner-prize-panel {
-  background: var(--yellow); padding: 30px 32px;
+  background: var(--blue-800); padding: 30px 32px;
   display: flex; flex-direction: column; justify-content: center; gap: 8px;
 }
 .pp-prize-label {
@@ -798,8 +798,8 @@ table.dt td.num, table.dt th.num { text-align: right; font-variant-numeric: tabu
 .pp-pod-pts span { font-size: 12px; font-weight: 600; color: var(--muted); margin-left: 3px; }
 .pp-pod-bar { margin-top: 14px; border-radius: 8px 8px 0 0; }
 .pp-pod-1 .pp-pod-bar { height: 72px; background: var(--yellow); }
-.pp-pod-2 .pp-pod-bar { height: 52px; background: var(--sky); }
-.pp-pod-3 .pp-pod-bar { height: 38px; background: #C69A6A; }
+.pp-pod-2 .pp-pod-bar { height: 52px; background: var(--blue-800); }
+.pp-pod-3 .pp-pod-bar { height: 38px; background: var(--sky); }
 .pp-pod-1 { transform: translateY(-8px); border-color: var(--yellow); }
 .pp-podium-pre .pp-pod-pts { color: var(--muted); }
 
@@ -818,8 +818,8 @@ table.dt td.num, table.dt th.num { text-align: right; font-variant-numeric: tabu
 }
 .pp-row-top { border-color: var(--sky); }
 .pp-row-1 { border-left: 4px solid var(--yellow); }
-.pp-row-2 { border-left: 4px solid var(--sky-deep); }
-.pp-row-3 { border-left: 4px solid #C69A6A; }
+.pp-row-2 { border-left: 4px solid var(--blue-800); }
+.pp-row-3 { border-left: 4px solid var(--sky); }
 .pp-rank { width: 34px; flex: 0 0 34px; text-align: center; font-size: 22px; }
 .pp-rank-num { font-family: var(--serif); font-weight: 700; font-size: 16px; color: var(--muted); }
 .pp-row-body { flex: 1; min-width: 0; }
@@ -828,8 +828,10 @@ table.dt td.num, table.dt th.num { text-align: right; font-variant-numeric: tabu
 .pp-pts { font-family: var(--serif); font-weight: 700; font-size: 20px; color: var(--blue-800); letter-spacing: -.01em; }
 .pp-pts-unit { font-size: 11px; font-weight: 600; color: var(--muted); margin-left: 3px; }
 .pp-bar-track { height: 5px; background: var(--sky-tint); border-radius: 999px; overflow: hidden; margin: 7px 0 5px; }
-.pp-bar-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--sky-deep), var(--blue-800)); transition: width .6s ease; }
-.pp-row-1 .pp-bar-fill { background: linear-gradient(90deg, var(--yellow), var(--yellow-deep)); }
+.pp-bar-fill { height: 100%; border-radius: 999px; background: var(--sky-deep); transition: width .6s ease; }
+.pp-row-1 .pp-bar-fill { background: var(--yellow); }
+.pp-row-2 .pp-bar-fill { background: var(--blue-800); }
+.pp-row-3 .pp-bar-fill { background: var(--sky); }
 .pp-row-meta { display: flex; gap: 16px; font-size: 12px; color: var(--slate); }
 
 /* ── Cards ────────────────────────────────────────────────────────────── */
