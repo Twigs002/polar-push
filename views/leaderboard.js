@@ -87,18 +87,27 @@
 
     const podium = rows.slice(0, 3);
 
+    const statusText = !tl.started ? "Not started yet" : tl.ended ? "Final" : `Week ${tl.week} of 8`;
+    const [prizeDesc, prizeAmount] = (POLAR.PRIZE || "").split("·").map(s => s.trim());
+
     $view.innerHTML = `
       <section class="pp-banner">
-        <div class="pp-banner-ic" aria-hidden="true">⚡❄️</div>
-        <div class="pp-banner-body">
-          <div class="pp-eyebrow">Operation · ${fmtDay(new Date(POLAR.START + "T00:00:00"))} - ${fmtDay(new Date(POLAR.END + "T00:00:00"))} 2026</div>
-          <div class="pp-banner-title">Polar&nbsp;Push</div>
-          <div class="pp-banner-prize">🏆 ${escapeHtml(POLAR.PRIZE)}</div>
+        <div class="pp-banner-main">
+          <div class="pp-banner-ic" aria-hidden="true">⚡❄️</div>
+          <div class="pp-banner-body">
+            <span class="pp-eyebrow">Operation · ${fmtDay(new Date(POLAR.START + "T00:00:00"))} - ${fmtDay(new Date(POLAR.END + "T00:00:00"))} 2026</span>
+            <h1 class="pp-banner-title">Polar&nbsp;Push</h1>
+            <div class="pp-banner-status">
+              <span class="pp-status-pill">${escapeHtml(statusText)}</span>
+              <span class="pp-banner-stat">${rows.length} teams · ${totalEntries} verified deal${totalEntries === 1 ? "" : "s"}</span>
+            </div>
+            <div class="pp-progress"><div class="pp-progress-fill" style="width:${tl.pct.toFixed(1)}%"></div></div>
+          </div>
         </div>
-        <div class="pp-banner-clock">
-          <div class="pp-phase">${escapeHtml(tl.phase)}</div>
-          <div class="pp-progress"><div class="pp-progress-fill" style="width:${tl.pct.toFixed(1)}%"></div></div>
-          <div class="pp-clock-sub">${tl.started ? (tl.ended ? "Final" : `${tl.daysLeft} day${tl.daysLeft === 1 ? "" : "s"} to go`) : "Not started yet"}</div>
+        <div class="pp-banner-prize-panel">
+          <span class="pp-prize-label">The Prize</span>
+          <div class="pp-prize-desc">${escapeHtml(prizeDesc || "Prize")}</div>
+          ${prizeAmount ? `<div class="pp-prize-value"><span class="pp-prize-amount">${escapeHtml(prizeAmount)}</span><span class="pp-prize-unit">value</span></div>` : ""}
         </div>
       </section>
 
