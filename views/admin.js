@@ -126,13 +126,14 @@
     return `<div class="pp-table-wrap">
       <table class="pp-entries pp-pending-table">
         <thead><tr>
-          <th>Team</th><th>Type</th><th class="num">Value</th><th class="num">Pts</th>
-          <th>Signed</th><th>Submitted by</th><th>Mandate</th><th></th>
+          <th>Team</th><th>Property</th><th>Type</th><th class="num">Value</th><th class="num">Pts</th>
+          <th>Signed</th><th>By</th><th>Mandate</th><th></th>
         </tr></thead>
         <tbody>
           ${entries.map(e => `
             <tr>
               <td>${escapeHtml(teamName(e.team_id))}</td>
+              <td title="${escapeAttr(e.property_address || "")}">${escapeHtml(UTILS.trunc(e.property_address || "", 22) || "")}</td>
               <td>${escapeHtml(POINTS.typeLabel(e.deal_type))}</td>
               <td class="num">${money(e.value_rand)}</td>
               <td class="num"><strong>${e.points}</strong></td>
@@ -156,19 +157,22 @@
     return `<div class="pp-table-wrap">
       <table class="pp-entries">
         <thead><tr>
-          <th>Team</th><th>Type</th><th class="num">Value</th><th class="num">Pts</th>
-          <th>Signed</th><th>Agent</th><th>Doc</th><th>Status</th><th></th>
+          <th>Team</th><th>Property</th><th>Type</th><th class="num">Value</th><th class="num">Pts</th>
+          <th>Signed</th><th>By</th><th>Doc / Ref</th><th>Status</th><th></th>
         </tr></thead>
         <tbody>
           ${entries.map(e => `
             <tr class="${e.voided ? "pp-voided" : ""} ${e.status === "rejected" ? "pp-rejected-row" : ""}">
               <td>${escapeHtml(teamName(e.team_id))}</td>
+              <td title="${escapeAttr(e.property_address || "")}">${escapeHtml(UTILS.trunc(e.property_address || "", 22) || "")}</td>
               <td>${escapeHtml(POINTS.typeLabel(e.deal_type))}</td>
               <td class="num">${money(e.value_rand)}</td>
               <td class="num"><strong>${(e.status === "verified" && !e.voided) ? e.points : "0"}</strong>${(e.voided || e.status === "rejected") ? `<span class="pp-strike">${e.points}</span>` : ""}</td>
               <td>${escapeHtml(fmtDate(e.signed_date))}</td>
-              <td>${escapeHtml(e.agent_name || e.submitted_by_name || "")}</td>
-              <td>${e.document_path ? `<button class="pp-mini pp-doc" data-doc="${escapeAttr(e.document_path)}" title="Open the signed mandate">📄</button>` : ""}</td>
+              <td>${escapeHtml(e.agent_name || e.submitted_by_name || "")}${e.source === "sheet" ? ` <span class="pp-src">sheet</span>` : ""}</td>
+              <td>${e.document_path
+                    ? `<button class="pp-mini pp-doc" data-doc="${escapeAttr(e.document_path)}" title="Open the signed mandate">📄</button>`
+                    : e.reference ? `<span class="pp-ref" title="Front-office ref - check on the OTP sheet">${escapeHtml(e.reference)}</span>` : ""}</td>
               <td>${statusPill(e)}</td>
               <td class="pp-actions">
                 ${e.status === "verified" ? `<button class="pp-mini" data-void="${e.id}" data-cur="${e.voided ? 1 : 0}" title="${e.voided ? "Restore points" : "Void - deal fell through"}">${e.voided ? "↺ Restore" : "Void"}</button>` : ""}

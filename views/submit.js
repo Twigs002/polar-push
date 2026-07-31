@@ -64,6 +64,9 @@
               <label>Signed date
                 <input name="signed_date" type="date">
               </label>
+              <label class="pp-span-2">Property address <span class="pp-req">required</span>
+                <input name="property_address" type="text" placeholder="e.g. 12 Beach Road, Sea Point" required>
+              </label>
             </div>
             <label class="pp-file-label">Signed mandate document <span class="pp-req">required</span>
               <input name="doc" type="file" accept="application/pdf,image/*" required>
@@ -142,21 +145,28 @@
       const $btn = $view.querySelector("#sub-submit");
       const fd = new FormData($form);
       const value = Number(String(fd.get("value_rand") || "").replace(/[^\d]/g, ""));
+      const address = (fd.get("property_address") || "").trim();
       const file = ($form.querySelector('[name="doc"]').files || [])[0];
       if (!fd.get("team_id") || !value) { window.toast({ title: "Team and value are required", ms: 3000 }); return; }
+      if (!address) { window.toast({ title: "Property address is required", ms: 3000 }); return; }
       if (!file) { window.toast({ title: "Attach the signed mandate document", ms: 3500 }); return; }
       if (file.size > 15 * 1024 * 1024) { window.toast({ title: "File too large", body: "Please keep it under 15 MB.", ms: 4000 }); return; }
       $btn.disabled = true; $btn.textContent = "Uploading…";
       try {
         const doc = await DATA.uploadMandateDoc(file, user);
+        // Human label for the file (used in the app + when it lands in Drive).
+        const teamName = ($form.querySelector('[name="team_id"] option:checked') || {}).textContent || "";
+        const ext = (file.name.split(".").pop() || "").toLowerCase();
+        const label = `${teamName.trim()} - ${address} (${POINTS.typeLabel(fd.get("deal_type"))})${ext ? "." + ext : ""}`;
         $btn.textContent = "Submitting…";
         await DATA.submitEntry({
           team_id: Number(fd.get("team_id")),
           deal_type: fd.get("deal_type"),
           value_rand: value,
           signed_date: fd.get("signed_date") || null,
+          property_address: address,
           document_path: doc.path,
-          document_name: doc.name,
+          document_name: label,
           submitted_by: user.username,
           submitted_by_name: user.name,
           created_by: user.username,
