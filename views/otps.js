@@ -50,7 +50,7 @@
           </div>
           <button class="btn-ghost" id="otp-refresh" title="Re-check for new OTPs">↻ Refresh</button>
         </div>
-        <p class="muted">Accepted sales (OTPs) pulled from the front-office sheet once a day. Points are allocated per the R5m brackets.</p>
+        <p class="muted">Accepted sales (OTPs) pulled directly from Dealflow once a day. Points are allocated per the R5m brackets.</p>
         <div class="pp-table-wrap">
           <table class="pp-entries">
             <thead><tr>
