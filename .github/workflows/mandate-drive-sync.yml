@@ -1,0 +1,38 @@
+name: Copy mandate docs → Drive
+
+# Copies submitted mandate documents into per-team Google Drive subfolders.
+# Runs every 30 minutes and on demand.
+on:
+  schedule:
+    - cron: '5,35 * * * *'
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: 'Why are you triggering a manual Drive sync?'
+        required: false
+        default: 'on demand'
+
+concurrency:
+  group: mandate-drive-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install deps
+        working-directory: scripts
+        run: pip install -r requirements.txt
+      - name: Copy mandates to Drive
+        working-directory: scripts
+        env:
+          SUPABASE_URL:             https://dqszbqiimbfvmmnpgpsb.supabase.co
+          SUPABASE_SERVICE_KEY:     ${{ secrets.SUPABASE_SERVICE_KEY }}
+          GCP_SA_JSON:              ${{ secrets.GCP_SA_JSON }}
+          MANDATES_DRIVE_FOLDER_ID: ${{ vars.MANDATES_DRIVE_FOLDER_ID }}
+        run: python3 mandate_drive_sync.py
