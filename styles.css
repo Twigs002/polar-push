@@ -910,21 +910,29 @@ table.dt td.num, table.dt th.num { text-align: right; font-variant-numeric: tabu
 .pp-danger:hover { background: var(--red-tint, #FBE2DD); border-color: var(--red, #D20A03); color: var(--red, #D20A03); }
 
 /* ── Scoring rules + calculator ───────────────────────────────────────── */
+/* Two columns so rules + calculator fit on one screen (no scrolling). */
+.pp-scoring { display: grid; grid-template-columns: 1fr 330px; gap: 18px; align-items: start; }
+.pp-scoring .pp-card { margin-bottom: 0; padding: 18px 20px; }
+.pp-scoring .pp-card h2 { margin-bottom: 4px; }
+.pp-scoring .pp-card > p.muted { margin: 4px 0 12px; font-size: 12.5px; }
+.pp-scoring .pp-card > p.small { margin: 10px 0 0; }
 .pp-rules th .th-note { display: block; font-weight: 500; text-transform: none; letter-spacing: 0; color: var(--muted); font-size: 10px; }
-.pp-rules td { text-align: right; }
+.pp-rules th { padding: 6px 8px; }
+.pp-rules td { text-align: right; padding: 6px 8px; }
 .pp-rules-type { font-family: var(--serif); font-weight: 700; color: var(--ink); text-align: left; }
-.pp-rules-base { display: block; font-family: var(--sans); font-weight: 500; font-size: 11px; color: var(--muted); }
+.pp-rules-base { display: block; font-family: var(--sans); font-weight: 500; font-size: 10.5px; color: var(--muted); }
 .pp-rules td strong { font-family: var(--serif); color: var(--blue-800); font-size: 15px; }
 .pp-rules tbody tr:hover { background: var(--sky-tint); }
-.pp-calc-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; max-width: 460px; }
+.pp-calc-controls { display: grid; grid-template-columns: 1fr; gap: 12px; }
 .pp-calc-out {
-  margin-top: 18px; padding: 20px; border-radius: var(--r-lg);
+  margin-top: 14px; padding: 16px; border-radius: var(--r);
   background: linear-gradient(135deg, var(--sky-tint), #fff);
   border: 1px solid var(--line); text-align: center;
 }
-.pp-calc-pts { font-family: var(--serif); font-weight: 700; font-size: 42px; color: var(--blue-800); line-height: 1; letter-spacing: -.01em; }
+.pp-calc-pts { font-family: var(--serif); font-weight: 700; font-size: 36px; color: var(--blue-800); line-height: 1; letter-spacing: -.01em; }
 .pp-calc-unit { font-size: 14px; font-weight: 600; color: var(--muted); margin-left: 6px; }
 .pp-calc-detail { margin-top: 8px; font-size: 13px; color: var(--slate); }
+@media (max-width: 860px) { .pp-scoring { grid-template-columns: 1fr; } }
 
 /* ── Teams management ─────────────────────────────────────────────────── */
 .pp-teams { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
