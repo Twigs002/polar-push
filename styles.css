@@ -999,3 +999,80 @@ table.dt td.num, table.dt th.num { text-align: right; font-variant-numeric: tabu
 
 /* Property address field spans the full submission grid width */
 .pp-form-grid .pp-span-2 { grid-column: 1 / -1; }
+
+/* ══════════════════════════════════════════════════════════════════════
+   Mobile (<= 640px): top-nav wraps with scrollable tabs, single-column
+   forms, tighter spacing. Wide tables keep their own horizontal scroll.
+   ══════════════════════════════════════════════════════════════════════ */
+@media (max-width: 640px) {
+  .topnav { flex-wrap: wrap; gap: 8px 12px; padding: 9px 12px; }
+  .brand { gap: 9px; }
+  .brand-logo { height: 30px; }
+  .topnav-divider { height: 22px; }
+  .brand-name { font-size: 12px; letter-spacing: 0.08em; }
+  .user-chip { margin-left: auto; gap: 8px; }
+  .user-chip .muted { display: none; }           /* keep just the Sign out button */
+  .topnav .btn-ghost { padding: 7px 12px; font-size: 13px; }
+  /* Tabs drop to their own full-width row and scroll horizontally. */
+  .tabs {
+    order: 3; flex: 1 0 100%; width: 100%;
+    gap: 2px; overflow-x: auto; -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tabs a { white-space: nowrap; padding: 8px 12px; }
+
+  .view { padding: 16px 14px; }
+
+  /* Banner */
+  .pp-banner-main { padding: 22px 18px; gap: 16px; }
+  .pp-banner-ic { width: 46px; height: 46px; font-size: 20px; }
+  .pp-banner-title { font-size: 30px; }
+  .pp-banner-prize-panel { padding: 22px 20px; }
+  .pp-eyebrow { font-size: 10px; letter-spacing: .1em; }
+
+  /* Cards + forms */
+  .pp-card { padding: 16px 15px; }
+  .pp-form-grid { grid-template-columns: 1fr; }
+  .pp-form-foot { flex-direction: column; align-items: stretch; gap: 12px; }
+  .pp-form-foot .btn-primary { width: 100%; }
+  .pp-preview { text-align: center; }
+
+  /* Standings rows */
+  .pp-row { padding: 10px 12px; gap: 10px; }
+  .pp-rank { width: 26px; flex-basis: 26px; font-size: 18px; }
+  .pp-team { font-size: 14px; }
+  .pp-pts { font-size: 18px; }
+  .pp-row-meta { gap: 12px; font-size: 11px; }
+  .pp-board-head, .pp-card-head { flex-wrap: wrap; gap: 4px 12px; }
+
+  /* Podium: keep 1-2-3 but compact */
+  .pp-podium { gap: 6px; }
+  .pp-pod { padding: 12px 6px 0; }
+  .pp-pod-medal { font-size: 22px; }
+  .pp-pod-name { font-size: 11px; }
+  .pp-pod-pts { font-size: 20px; }
+  .pp-pod-1 .pp-pod-bar { height: 54px; }
+  .pp-pod-2 .pp-pod-bar { height: 40px; }
+  .pp-pod-3 .pp-pod-bar { height: 30px; }
+
+  /* Tables read a touch smaller; wrappers already scroll horizontally. */
+  .pp-entries, .pp-rules { font-size: 12px; }
+  .pp-entries th, .pp-rules th { font-size: 10px; }
+
+  /* Calculator big number */
+  .pp-calc-pts { font-size: 32px; }
+
+  /* Login */
+  .login { padding: 16px; }
+  .login-card { padding: 28px 22px; }
+  .login-card h1 { font-size: 25px; }
+}
+
+@media (max-width: 400px) {
+  .pp-banner-title { font-size: 26px; }
+  .pp-banner-prize-panel { padding: 18px 18px; }
+  .pp-prize-desc { font-size: 21px; }
+  .pp-prize-amount { font-size: 26px; }
+  .brand-name { display: none; }                 /* logo + bolt is enough */
+}
