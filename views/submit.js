@@ -35,9 +35,9 @@
     const mine = (user.division || "").toLowerCase();
     const defaultTeam = teams.find(t => t.name.toLowerCase() === mine);
 
-    const mySubs = cache.entries
-      .filter(e => e.submitted_by && e.submitted_by === user.username)
-      .slice(0, 40);
+    // Entries are RLS-scoped to the user's team(s), so this is the team's
+    // submissions (admins see everything).
+    const mySubs = (cache.entries || []).slice(0, 200);
 
     $view.innerHTML = `
       <div class="pp-submit">
@@ -84,10 +84,10 @@
 
         <div class="pp-card" ${user && user.username ? "" : "hidden"}>
           <div class="pp-card-head">
-            <h2>My submissions</h2>
+            <h2>Team submissions</h2>
             <span class="muted small">${mySubs.length ? `${mySubs.length} shown` : ""}</span>
           </div>
-          ${mySubs.length ? mySubsTable(mySubs, cache.teams) : `<p class="muted">Nothing submitted yet. Your deals will show here with their status.</p>`}
+          ${mySubs.length ? mySubsTable(mySubs, cache.teams) : `<p class="muted">No submissions for your team yet. Your team's mandates show here with their status.</p>`}
         </div>
       </div>`;
 
@@ -99,7 +99,7 @@
     return `<div class="pp-table-wrap">
       <table class="pp-entries">
         <thead><tr>
-          <th>Team</th><th>Type</th><th class="num">Value</th><th class="num">Pts</th>
+          <th>Team</th><th>By</th><th>Type</th><th class="num">Value</th><th class="num">Pts</th>
           <th>Signed</th><th>Status</th>
         </tr></thead>
         <tbody>
@@ -109,6 +109,7 @@
               : e.voided ? `<div class="pp-sub-note">Voided - deal fell through</div>` : "";
             return `<tr class="${e.voided ? "pp-voided" : ""}">
               <td>${escapeHtml(teamName(e.team_id))}</td>
+              <td>${escapeHtml(e.submitted_by_name || e.agent_name || "")}</td>
               <td>${escapeHtml(POINTS.typeLabel(e.deal_type))}</td>
               <td class="num">${money(e.value_rand)}</td>
               <td class="num"><strong>${(e.status === "verified" && !e.voided) ? e.points : "-"}</strong></td>
