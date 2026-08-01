@@ -64,9 +64,6 @@
               <label>Signed date
                 <input name="signed_date" type="date">
               </label>
-              <label>Your name <span class="pp-req">required</span>
-                <input name="submitter" type="text" value="${escapeAttr((user && user.name) || "")}" placeholder="Who's submitting" required>
-              </label>
               <label class="pp-span-2">Property address <span class="pp-req">required</span>
                 <input name="property_address" type="text" placeholder="e.g. 12 Beach Road, Sea Point" required>
               </label>
@@ -150,10 +147,9 @@
       const fd = new FormData($form);
       const value = Number(String(fd.get("value_rand") || "").replace(/[^\d]/g, ""));
       const address = (fd.get("property_address") || "").trim();
-      const submitter = (fd.get("submitter") || "").trim();
+      const submitter = (user && user.name) || null;   // from the logged-in user
       const file = ($form.querySelector('[name="doc"]').files || [])[0];
       if (!fd.get("team_id") || !value) { window.toast({ title: "Team and value are required", ms: 3000 }); return; }
-      if (!submitter) { window.toast({ title: "Your name is required", ms: 3000 }); return; }
       if (!address) { window.toast({ title: "Property address is required", ms: 3000 }); return; }
       if (!file) { window.toast({ title: "Attach the signed mandate document", ms: 3500 }); return; }
       if (file.size > 15 * 1024 * 1024) { window.toast({ title: "File too large", body: "Please keep it under 15 MB.", ms: 4000 }); return; }
