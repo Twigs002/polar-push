@@ -1067,6 +1067,20 @@ table.dt td.num, table.dt th.num { text-align: right; font-variant-numeric: tabu
   .login { padding: 16px; }
   .login-card { padding: 28px 22px; }
   .login-card h1 { font-size: 25px; }
+
+  /* 16px min on all inputs so iOS Safari doesn't jerk-zoom on focus */
+  .pp-form input, .pp-form select,
+  .login-card input, .search,
+  .pp-calc-controls input, #calc-value,
+  .range-input { font-size: 16px; }
+
+  /* Admin pending queue: drop low-value columns (Type, Value, Signed, By)
+     so the Approve/Reject/Void actions are reachable without scrolling the row.
+     Cols kept: Team, Property, Pts, Mandate, Actions. */
+  .pp-pending-table th:nth-child(3), .pp-pending-table td:nth-child(3),
+  .pp-pending-table th:nth-child(4), .pp-pending-table td:nth-child(4),
+  .pp-pending-table th:nth-child(6), .pp-pending-table td:nth-child(6),
+  .pp-pending-table th:nth-child(7), .pp-pending-table td:nth-child(7) { display: none; }
 }
 
 @media (max-width: 400px) {
