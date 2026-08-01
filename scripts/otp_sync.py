@@ -78,6 +78,10 @@ def points_for(price: float) -> int:
 
 
 def main() -> None:
+    # Not armed yet? Skip cleanly (green run) instead of failing every schedule.
+    if not (os.environ.get("SUPABASE_SERVICE_KEY") and os.environ.get("GCP_SA_JSON")):
+        print("OTP sync not configured yet (missing GCP_SA_JSON / SUPABASE_SERVICE_KEY); skipping.")
+        return
     sb = supabase()
 
     # team name (lowercased) -> id

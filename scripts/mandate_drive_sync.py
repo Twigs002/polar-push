@@ -77,6 +77,12 @@ def filename_for(entry: str, ext: str) -> str:
 
 
 def main() -> None:
+    # Not armed yet? Skip cleanly (green run) instead of failing every schedule.
+    if not (os.environ.get("SUPABASE_SERVICE_KEY") and os.environ.get("GCP_SA_JSON")
+            and os.environ.get("MANDATES_DRIVE_FOLDER_ID")):
+        print("Drive sync not configured yet (missing GCP_SA_JSON / SUPABASE_SERVICE_KEY / "
+              "MANDATES_DRIVE_FOLDER_ID); skipping.")
+        return
     parent = _need("MANDATES_DRIVE_FOLDER_ID")
     sb = supabase()
     dv = drive()
