@@ -87,10 +87,6 @@ def parse_price(raw) -> float:
         return 0.0
 
 
-def points_for(price: float) -> int:
-    return OTP_BASE * (int(price // BRACKET) + 1)
-
-
 def main() -> None:
     # Not armed yet? Skip cleanly (green run) instead of failing every schedule.
     if not (os.environ.get("SUPABASE_SERVICE_KEY") and os.environ.get("GCP_SA_JSON")):
@@ -154,6 +150,20 @@ def main() -> None:
             continue
         seen.add(rec["reference"])
         deduped.append(rec)
+
+    # Preserve admin decisions: if an admin has REJECTED a sheet OTP, keep it
+    # rejected rather than re-verifying it every run. (voided/points survive by
+    # omission; value_rand/team_id remain sheet-driven by design.)
+    rejected = set()
+    refs = [rec["reference"] for rec in deduped]
+    for i in range(0, len(refs), 200):
+        part = refs[i:i + 200]
+        existing = (sb.table("polar_push_entries")
+                    .select("reference,status").in_("reference", part).execute().data or [])
+        rejected.update(row["reference"] for row in existing if row.get("status") == "rejected")
+    for rec in deduped:
+        if rec["reference"] in rejected:
+            rec["status"] = "rejected"
 
     if deduped:
         # Upsert on reference. `points` is a generated column (never sent) and
