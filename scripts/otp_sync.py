@@ -14,6 +14,7 @@ Env:
 """
 import json
 import os
+import re
 import sys
 from datetime import datetime
 
@@ -54,11 +55,21 @@ def supabase():
     return create_client(_need("SUPABASE_URL"), _need("SUPABASE_SERVICE_KEY"))
 
 
+# Accepted date formats. ISO first, then ZA front-office display formats.
+# NB: day-first (%d/%m/%Y) is deliberate — this is a South African sheet, so
+# 01/08/2026 means 1 August, not 8 January.
+_DATE_FORMATS = (
+    "%Y-%m-%d %H:%M:%S", "%Y-%m-%dT%H:%M:%S", "%Y-%m-%d", "%Y/%m/%d",
+    "%d/%m/%Y", "%d/%m/%y", "%d-%m-%Y",
+    "%d %B %Y", "%d %b %Y",
+)
+
+
 def parse_date(raw: str):
-    raw = (raw or "").strip()
+    raw = re.sub(r"\s+", " ", str(raw or "")).strip()
     if not raw:
         return None
-    for fmt in ("%Y-%m-%d %H:%M:%S", "%Y-%m-%d", "%Y/%m/%d"):
+    for fmt in _DATE_FORMATS:
         try:
             return datetime.strptime(raw, fmt)
         except ValueError:
@@ -67,8 +78,11 @@ def parse_date(raw: str):
 
 
 def parse_price(raw) -> float:
+    # Strip currency symbol and any thousands grouping (spaces, NBSP,
+    # commas: "R5 000 000", "5,000,000"); keep the decimal point.
+    s = re.sub(r"[^\d.]", "", str(raw))
     try:
-        return float(str(raw).replace(",", "").replace("R", "").strip())
+        return float(s) if s not in ("", ".") else 0.0
     except (TypeError, ValueError):
         return 0.0
 
