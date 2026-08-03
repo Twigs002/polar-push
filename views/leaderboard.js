@@ -57,9 +57,39 @@
     </div>`;
   }
 
-  function render($view, ctx) {
-    const { cache, user } = ctx;
+  // Live-refresh controller. render() is called by the router on each visit;
+  // it paints instantly from the boot snapshot, pulls fresh standings, and
+  // polls every 60s so a wall-mounted board stays current without a reload.
+  let _timer = null;
 
+  function render($view, ctx) {
+    const user = ctx.user;
+    if (_timer) { clearInterval(_timer); _timer = null; }
+    if (ctx.cache) paint($view, ctx.cache, user);   // instant paint from login snapshot
+    refresh($view, user);                            // then pull the latest
+    _timer = setInterval(() => {
+      const active = document.querySelector(".tabs a.active");
+      const onLeaderboard = !active || active.dataset.tab === "leaderboard";
+      if (!onLeaderboard) { clearInterval(_timer); _timer = null; return; }
+      refresh($view, user);
+    }, 60000);
+  }
+
+  async function refresh($view, user) {
+    const $btn = $view.querySelector("#pp-refresh");
+    if ($btn) { $btn.disabled = true; $btn.classList.add("pp-spin"); }
+    try {
+      const res = await DATA.loadStandings(true);
+      paint($view, { ready: res.ready, standings: res.standings, at: res.at }, user);
+    } catch (e) {
+      const $upd = $view.querySelector("#pp-updated");
+      if ($upd) $upd.textContent = "refresh failed";
+      const $b = $view.querySelector("#pp-refresh");
+      if ($b) { $b.disabled = false; $b.classList.remove("pp-spin"); }
+    }
+  }
+
+  function paint($view, cache, user) {
     if (!cache.ready) {
       $view.innerHTML = setupNotice(user);
       return;
@@ -118,12 +148,21 @@
         <div class="pp-board-head">
           <h2>Standings</h2>
           ${leader && leader.total > 0 ? `<span class="pp-leader-note">${escapeHtml(leader.name)} out front${leader.total ? ` · ${leader.total} pts` : ""}</span>` : `<span class="pp-leader-note muted">No points on the board yet - it's all to play for.</span>`}
+          <span class="pp-board-controls">
+            <span class="muted small" id="pp-updated"></span>
+            <button class="btn-ghost" id="pp-refresh" title="Re-check the standings">↻ Refresh</button>
+          </span>
         </div>
         <div class="pp-rows">
           ${rows.map(r => rowHtml(r, maxPts)).join("")}
         </div>
       </section>
     `;
+
+    const $refresh = $view.querySelector("#pp-refresh");
+    if ($refresh) $refresh.addEventListener("click", () => refresh($view, user));
+    const $upd = $view.querySelector("#pp-updated");
+    if ($upd && cache.at) $upd.textContent = `updated ${UTILS.humanAgo(cache.at)}`;
   }
 
   function renderPodium(podium, tl) {

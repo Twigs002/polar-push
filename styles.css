@@ -1097,4 +1097,5 @@ table.dt td.num, table.dt th.num { text-align: right; font-variant-numeric: tabu
 .pp-spin { opacity: .7; }
 .pp-spin::before { content: ""; }
 @keyframes pp-spin-kf { to { transform: rotate(360deg); } }
-#otp-refresh.pp-spin { animation: pp-spin-kf .8s linear infinite; }
+#otp-refresh.pp-spin, #pp-refresh.pp-spin { animation: pp-spin-kf .8s linear infinite; }
+.pp-board-controls { display: inline-flex; align-items: center; gap: 10px; margin-left: auto; }

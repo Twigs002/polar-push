@@ -3,6 +3,11 @@
 (function () {
   const { escapeHtml, escapeAttr } = UTILS;
 
+  // The delegated click handler is bound ONCE to the persistent #view node
+  // (see wire()); it reads the current admin from here so the single binding
+  // always acts as the logged-in user.
+  let _adminUser = null;
+
   function money(v) {
     return "R" + (Number(v) || 0).toLocaleString("en-ZA");
   }
@@ -196,6 +201,7 @@
   }
 
   function wire($view, user, teams) {
+    _adminUser = user;
     const $form = $view.querySelector("#entry-form");
     if ($form) {
       const $value = $form.querySelector('[name="value_rand"]');
@@ -246,69 +252,76 @@
       });
     }
 
-    // Delegated actions for entries + teams.
-    $view.addEventListener("click", async (e) => {
-      const btn = e.target.closest("button");
-      if (!btn) return;
+    // Delegated actions for entries + teams. Bind ONCE: #view is a persistent
+    // node (app.js grabs it a single time; render only swaps innerHTML), so
+    // re-binding on every render would stack handlers and fire each action N
+    // times. The handler reads _adminUser, refreshed by wire() on each render.
+    if (!$view.__ppAdminClickWired) {
+      $view.__ppAdminClickWired = true;
+      $view.addEventListener("click", async (e) => {
+        const btn = e.target.closest("button");
+        if (!btn) return;
+        const user = _adminUser;
 
-      if (btn.dataset.doc) {
-        const orig = btn.textContent;
-        btn.disabled = true; btn.textContent = "Opening…";
-        try {
-          const url = await DATA.mandateDocUrl(btn.dataset.doc);
-          if (url) window.open(url, "_blank", "noopener");
-          else window.toast({ title: "No document on file", ms: 3000 });
-        } catch (err) {
-          window.toast({ title: "Could not open document", body: escapeHtml(err.message || String(err)), ms: 5000 });
-        } finally {
-          btn.disabled = false; btn.textContent = orig;
+        if (btn.dataset.doc) {
+          const orig = btn.textContent;
+          btn.disabled = true; btn.textContent = "Opening…";
+          try {
+            const url = await DATA.mandateDocUrl(btn.dataset.doc);
+            if (url) window.open(url, "_blank", "noopener");
+            else window.toast({ title: "No document on file", ms: 3000 });
+          } catch (err) {
+            window.toast({ title: "Could not open document", body: escapeHtml(err.message || String(err)), ms: 5000 });
+          } finally {
+            btn.disabled = false; btn.textContent = orig;
+          }
+          return;
         }
-        return;
-      }
-      if (btn.dataset.verify) {
-        await guard(btn, () => DATA.verifyEntry(btn.dataset.verify, user), $view, user, "Deal verified");
-        return;
-      }
-      if (btn.dataset.reject) {
-        const reason = window.prompt("Reject this submission. Reason (optional):", "");
-        if (reason === null) return;
-        await guard(btn, () => DATA.rejectEntry(btn.dataset.reject, reason, user), $view, user, "Submission rejected");
-        return;
-      }
-      if (btn.dataset.void) {
-        const willVoid = btn.dataset.cur === "0";
-        let reason = null;
-        if (willVoid) {
-          reason = window.prompt("Void this deal (points removed). Reason (optional):", "Fell through");
-          if (reason === null) return; // cancelled
+        if (btn.dataset.verify) {
+          await guard(btn, () => DATA.verifyEntry(btn.dataset.verify, user), $view, user, "Deal verified");
+          return;
         }
-        await guard(btn, () => DATA.setEntryVoided(btn.dataset.void, willVoid, reason), $view, user,
-          willVoid ? "Deal voided" : "Deal restored");
-        return;
-      }
-      if (btn.dataset.del) {
-        if (!window.confirm("Delete this deal permanently? This cannot be undone.")) return;
-        await guard(btn, () => DATA.deleteEntry(btn.dataset.del), $view, user, "Deal deleted");
-        return;
-      }
-      if (btn.dataset.teamToggle) {
-        const active = btn.dataset.active === "0";
-        await guard(btn, () => DATA.updateTeam(Number(btn.dataset.teamToggle), { active }), $view, user,
-          active ? "Team activated" : "Team deactivated");
-        return;
-      }
-      if (btn.dataset.teamDel) {
-        if (!window.confirm("Delete this team? Only works if it has no deals logged.")) return;
-        try {
-          await DATA.deleteTeam(Number(btn.dataset.teamDel));
-          window.toast({ title: "Team deleted", ms: 2500 });
-          await rerender($view, user);
-        } catch (err) {
-          window.toast({ title: "Could not delete team", body: "It probably has deals logged - deactivate it instead.", ms: 5000 });
+        if (btn.dataset.reject) {
+          const reason = window.prompt("Reject this submission. Reason (optional):", "");
+          if (reason === null) return;
+          await guard(btn, () => DATA.rejectEntry(btn.dataset.reject, reason, user), $view, user, "Submission rejected");
+          return;
         }
-        return;
-      }
-    });
+        if (btn.dataset.void) {
+          const willVoid = btn.dataset.cur === "0";
+          let reason = null;
+          if (willVoid) {
+            reason = window.prompt("Void this deal (points removed). Reason (optional):", "Fell through");
+            if (reason === null) return; // cancelled
+          }
+          await guard(btn, () => DATA.setEntryVoided(btn.dataset.void, willVoid, reason), $view, user,
+            willVoid ? "Deal voided" : "Deal restored");
+          return;
+        }
+        if (btn.dataset.del) {
+          if (!window.confirm("Delete this deal permanently? This cannot be undone.")) return;
+          await guard(btn, () => DATA.deleteEntry(btn.dataset.del), $view, user, "Deal deleted");
+          return;
+        }
+        if (btn.dataset.teamToggle) {
+          const active = btn.dataset.active === "0";
+          await guard(btn, () => DATA.updateTeam(Number(btn.dataset.teamToggle), { active }), $view, user,
+            active ? "Team activated" : "Team deactivated");
+          return;
+        }
+        if (btn.dataset.teamDel) {
+          if (!window.confirm("Delete this team? Only works if it has no deals logged.")) return;
+          try {
+            await DATA.deleteTeam(Number(btn.dataset.teamDel));
+            window.toast({ title: "Team deleted", ms: 2500 });
+            await rerender($view, user);
+          } catch (err) {
+            window.toast({ title: "Could not delete team", body: "It probably has deals logged - deactivate it instead.", ms: 5000 });
+          }
+          return;
+        }
+      });
+    }
 
     const $teamForm = $view.querySelector("#team-form");
     if ($teamForm) {
