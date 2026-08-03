@@ -90,7 +90,10 @@ window.DATA = (() => {
     return _cache;
   }
 
-  function invalidate() { _cache = null; }
+  // Any entry/team mutation can shift the aggregate standings, so drop that
+  // cache too - otherwise the leaderboard keeps serving the login snapshot.
+  function invalidate() { _cache = null; _standings = null; }
+  function invalidateStandings() { _standings = null; }
 
   // Public aggregate standings (the leaderboard reads this; anon-readable via
   // a grant on the view, so no PIN is needed to watch the scoreboard).
@@ -99,9 +102,9 @@ window.DATA = (() => {
     if (_standings && !force) return _standings;
     try {
       const rows = await _allRows("polar_push_standings", { col: "total_points", asc: false });
-      _standings = { ready: true, standings: rows };
+      _standings = { ready: true, standings: rows, at: new Date() };
     } catch (e) {
-      if (_missingTable(e)) { _standings = { ready: false, standings: [] }; }
+      if (_missingTable(e)) { _standings = { ready: false, standings: [], at: new Date() }; }
       else throw e;
     }
     return _standings;
@@ -230,7 +233,7 @@ window.DATA = (() => {
 
   return {
     client, signIn, signOut, getSession, loadAll, invalidate,
-    loadStandings, loadOtps, invalidateOtps,
+    loadStandings, invalidateStandings, loadOtps, invalidateOtps,
     uploadMandateDoc, mandateDocUrl,
     submitEntry, addEntry, verifyEntry, rejectEntry,
     updateEntry, setEntryVoided, deleteEntry,
