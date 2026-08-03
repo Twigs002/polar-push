@@ -60,11 +60,6 @@
 
   $signin.addEventListener("click", () => showLogin());
   $signout.addEventListener("click", async () => { await DATA.signOut(); location.reload(); });
-  // "← View the leaderboard" on the login screen: return to the (public) app.
-  const $loginBack = document.getElementById("login-back");
-  if ($loginBack) $loginBack.addEventListener("click", (e) => {
-    e.preventDefault(); location.hash = "#/leaderboard"; showApp(_user); router(_user, _cache);
-  });
 
   async function boot(user) {
     showApp(user);
@@ -73,7 +68,9 @@
     try {
       standings = await DATA.loadStandings();
       if (user && !user.isPublic) {
-        try { full = await DATA.loadAll(); } catch (e) { /* raw entries need auth; leaderboard uses the view */ }
+        // Leaderboard uses the aggregate view, so a failure here isn't fatal -
+        // but surface it (a transient/RLS error shouldn't look like "no data").
+        try { full = await DATA.loadAll(); } catch (e) { console.warn("loadAll failed; entry-level views may be empty:", e); }
       }
     } catch (e) {
       $view.innerHTML = `<div class="error-box">Could not load data: ${escapeHtml(e.message || String(e))}</div>`;

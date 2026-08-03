@@ -210,14 +210,14 @@
       const $bracket = $view.querySelector("#entry-bracket");
 
       const preview = () => {
-        const raw = ($value.value || "").replace(/[^\d]/g, "");
+        const raw = UTILS.randDigits($value.value);
         const v = raw ? Number(raw) : 0;
-        const pts = POINTS.points($type.value, v);
-        $pts.textContent = pts;
+        // Blank field shows 0 - never a fake "2 pts" the DB would reject.
+        $pts.textContent = raw ? String(POINTS.points($type.value, v)) : "0";
         $bracket.textContent = raw ? `· ${POINTS.bracketLabel(v)}` : "";
       };
       $value.addEventListener("input", () => {
-        const raw = ($value.value || "").replace(/[^\d]/g, "");
+        const raw = UTILS.randDigits($value.value);
         $value.value = raw ? Number(raw).toLocaleString("en-ZA").replace(/,/g, " ") : "";
         preview();
       });
@@ -228,7 +228,7 @@
         e.preventDefault();
         const $submit = $view.querySelector("#entry-submit");
         const fd = new FormData($form);
-        const value = Number(String(fd.get("value_rand") || "").replace(/[^\d]/g, ""));
+        const value = Number(UTILS.randDigits(fd.get("value_rand")) || 0);
         if (!fd.get("team_id") || !value) { window.toast({ title: "Team and value are required", ms: 3000 }); return; }
         $submit.disabled = true; $submit.textContent = "Saving…";
         try {

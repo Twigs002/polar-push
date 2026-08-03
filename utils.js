@@ -41,6 +41,15 @@ window.UTILS = (() => {
 
   function pct(n, d) { return d ? `${(n / d * 100).toFixed(1)}%` : "-"; }
 
+  // Digit string of a rand value's WHOLE part. Drops a trailing cents group
+  // written with either separator (".50" or ",00"), then keeps digits only, so
+  // "R12 500 000.50" and "5 000 000,00" both yield the whole rand amount rather
+  // than the old "1250000050" (dot stripped and the cents concatenated, ~100x).
+  // A 3+ digit trailing group is a thousands group, not cents, so it's kept.
+  function randDigits(s) {
+    return String(s == null ? "" : s).trim().replace(/[.,]\d{1,2}$/, "").replace(/\D/g, "");
+  }
+
   // Empty-state HTML when filters return zero rows
   function emptyState(message = "No leads match the current filters.") {
     return `<div class="empty-state">
@@ -50,5 +59,5 @@ window.UTILS = (() => {
     </div>`;
   }
 
-  return { escapeHtml, escapeAttr, trunc, fmtDate, fmtShortDate, humanAgo, pct, emptyState };
+  return { escapeHtml, escapeAttr, trunc, fmtDate, fmtShortDate, humanAgo, pct, randDigits, emptyState };
 })();

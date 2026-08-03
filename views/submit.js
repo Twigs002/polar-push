@@ -128,13 +128,14 @@
     const $bracket = $view.querySelector("#sub-bracket");
 
     const preview = () => {
-      const raw = ($value.value || "").replace(/[^\d]/g, "");
+      const raw = UTILS.randDigits($value.value);
       const v = raw ? Number(raw) : 0;
-      $pts.textContent = POINTS.points($type.value, v);
+      // Blank field shows 0 - never a fake "2 pts" the DB would reject.
+      $pts.textContent = raw ? String(POINTS.points($type.value, v)) : "0";
       $bracket.textContent = raw ? `· ${POINTS.bracketLabel(v)}` : "";
     };
     $value.addEventListener("input", () => {
-      const raw = ($value.value || "").replace(/[^\d]/g, "");
+      const raw = UTILS.randDigits($value.value);
       $value.value = raw ? Number(raw).toLocaleString("en-ZA").replace(/,/g, " ") : "";
       preview();
     });
@@ -145,7 +146,7 @@
       e.preventDefault();
       const $btn = $view.querySelector("#sub-submit");
       const fd = new FormData($form);
-      const value = Number(String(fd.get("value_rand") || "").replace(/[^\d]/g, ""));
+      const value = Number(UTILS.randDigits(fd.get("value_rand")) || 0);
       const address = (fd.get("property_address") || "").trim();
       const submitter = (user && user.name) || null;   // from the logged-in user
       const file = ($form.querySelector('[name="doc"]').files || [])[0];
