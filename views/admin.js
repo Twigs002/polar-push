@@ -8,6 +8,70 @@
   // always acts as the logged-in user.
   let _adminUser = null;
 
+  // Canned rejection reasons. The chosen text is stored on the entry and shown
+  // to the submitter, so keep it plain and actionable.
+  const REJECT_REASONS = [
+    "Missing seller signature",
+    "Missing seller details (e.g. seller's name & surname, email address)",
+    "Missing start date / end date",
+  ];
+
+  // Custom (non-blocking) reason picker - a native prompt() would freeze the
+  // tab. Resolves to the reason string, or null if cancelled.
+  function pickRejectReason() {
+    return new Promise((resolve) => {
+      const overlay = document.createElement("div");
+      overlay.className = "pp-modal-overlay";
+      overlay.innerHTML = `
+        <div class="pp-modal" role="dialog" aria-modal="true" aria-label="Reject mandate">
+          <h3 class="pp-modal-title">Reject mandate</h3>
+          <p class="muted small">Pick the reason - the submitter is told exactly what to fix.</p>
+          <div class="pp-reject-reasons">
+            ${REJECT_REASONS.map((r, i) => `
+              <label class="pp-radio">
+                <input type="radio" name="pp-reject" value="${escapeAttr(r)}" ${i === 0 ? "checked" : ""}>
+                <span>${escapeHtml(r)}</span>
+              </label>`).join("")}
+            <label class="pp-radio">
+              <input type="radio" name="pp-reject" value="__other__">
+              <span>Other</span>
+            </label>
+            <input type="text" class="pp-reject-other" placeholder="Type the reason" disabled maxlength="200">
+          </div>
+          <div class="pp-modal-foot">
+            <button class="btn-ghost" data-act="cancel">Cancel</button>
+            <button class="btn-primary pp-reject-confirm" data-act="confirm">Reject mandate</button>
+          </div>
+        </div>`;
+      document.body.appendChild(overlay);
+      const $other = overlay.querySelector(".pp-reject-other");
+      let settled = false;
+      const close = (val) => { if (settled) return; settled = true; overlay.remove(); resolve(val); };
+
+      overlay.addEventListener("change", (e) => {
+        if (e.target.name === "pp-reject") {
+          const isOther = e.target.value === "__other__";
+          $other.disabled = !isOther;
+          if (isOther) $other.focus();
+        }
+      });
+      overlay.addEventListener("click", (e) => {
+        if (e.target === overlay) return close(null);
+        const act = (e.target.closest("button") || {}).dataset ? e.target.closest("button").dataset.act : null;
+        if (act === "cancel") return close(null);
+        if (act === "confirm") {
+          const sel = overlay.querySelector('input[name="pp-reject"]:checked');
+          let reason = sel ? sel.value : REJECT_REASONS[0];
+          if (reason === "__other__") {
+            reason = ($other.value || "").trim();
+            if (!reason) { $other.focus(); return; }
+          }
+          close(reason);
+        }
+      });
+    });
+  }
+
   function money(v) {
     return "R" + (Number(v) || 0).toLocaleString("en-ZA");
   }
@@ -282,7 +346,7 @@
           return;
         }
         if (btn.dataset.reject) {
-          const reason = window.prompt("Reject this submission. Reason (optional):", "");
+          const reason = await pickRejectReason();
           if (reason === null) return;
           await guard(btn, () => DATA.rejectEntry(btn.dataset.reject, reason, user), $view, user, "Submission rejected");
           return;

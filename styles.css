@@ -1099,3 +1099,26 @@ table.dt td.num, table.dt th.num { text-align: right; font-variant-numeric: tabu
 @keyframes pp-spin-kf { to { transform: rotate(360deg); } }
 #otp-refresh.pp-spin, #pp-refresh.pp-spin { animation: pp-spin-kf .8s linear infinite; }
 .pp-board-controls { display: inline-flex; align-items: center; gap: 10px; margin-left: auto; }
+
+/* Reject-reason modal */
+.pp-modal-overlay {
+  position: fixed; inset: 0; z-index: 1000;
+  display: flex; align-items: center; justify-content: center; padding: 20px;
+  background: rgba(15, 23, 42, .55);
+}
+.pp-modal {
+  background: var(--card); border: 1px solid var(--line);
+  border-radius: var(--r-lg); box-shadow: var(--shadow-lg, 0 20px 60px rgba(0,0,0,.25));
+  padding: 22px; width: 100%; max-width: 460px;
+}
+.pp-modal-title { margin: 0 0 4px; }
+.pp-reject-reasons { display: flex; flex-direction: column; gap: 10px; margin: 16px 0; }
+.pp-radio { display: flex; align-items: flex-start; gap: 10px; cursor: pointer; font-size: 14px; }
+.pp-radio input { margin-top: 2px; }
+.pp-reject-other {
+  margin-top: 2px; padding: 9px 11px; border: 1px solid var(--line);
+  border-radius: var(--r-md, 8px); font: inherit; width: 100%;
+}
+.pp-reject-other:disabled { opacity: .5; }
+.pp-modal-foot { display: flex; justify-content: flex-end; gap: 10px; margin-top: 8px; }
+.pp-reject-confirm { background: var(--danger, #D20A03); border-color: var(--danger, #D20A03); }
