@@ -12,7 +12,7 @@
       sales: Number(s.sale_count) || 0,
       entries: Number(s.entry_count) || 0,
     }));
-    rows.sort((a, b) => b.total - a.total || a.name.localeCompare(b.name));
+    rows.sort((a, b) => b.total - a.total || (a.name || "").localeCompare(b.name || ""));
     // Dense rank so tied teams share a place.
     let place = 0, lastPts = null;
     rows.forEach((r, i) => {

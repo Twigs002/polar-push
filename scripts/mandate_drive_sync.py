@@ -93,7 +93,9 @@ def main() -> None:
             .select("id,team_id,deal_type,property_address,document_path,document_name,drive_file_id,status")
             .not_.is_("document_path", "null")
             .is_("drive_file_id", "null")
-            .neq("status", "rejected")
+            # exclude rejected, but keep NULL-status rows (status <> 'rejected'
+            # is NULL, not true, for them - they'd otherwise be dropped).
+            .or_("status.is.null,status.neq.rejected")
             .execute().data or [])
 
     if not rows:
