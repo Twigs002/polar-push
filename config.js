@@ -8,7 +8,7 @@ window.QUAY = {
   AUTH_EMAIL_DOMAIN: "quay1.local",
   // Google Apps Script Web App that emails the submitter when a mandate is
   // declined (Gmail, same as the other Quay dashboards). Filled once deployed.
-  DECLINE_MAIL_URL: "",
+  DECLINE_MAIL_URL: "https://script.google.com/macros/s/AKfycbx55p4WGM1iCjIikJSrBg28REgddFnPsmH5VISPl54QEzxAIx--nzi-ivej5D8TqmUbCw/exec",
 };
 
 // Operation Polar Push - 8-week team competition.
