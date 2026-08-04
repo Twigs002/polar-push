@@ -24,6 +24,12 @@ var TYPE_LABEL = {
   otp: "Sale (OTP)", lease: "Lease"
 };
 
+// A stray GET (someone opening the /exec URL, a redirect-follow) should not
+// error the execution log - just say the endpoint is alive.
+function doGet(e) {
+  return _json({ ok: true, service: "polar-push mandate-declined mailer" });
+}
+
 function doPost(e) {
   try {
     var body = JSON.parse((e && e.postData && e.postData.contents) || "{}");

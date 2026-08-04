@@ -198,9 +198,14 @@ window.DATA = (() => {
     const url = (window.QUAY && QUAY.DECLINE_MAIL_URL) || "";
     if (!url) return;
     try {
+      // text/plain keeps this a "simple" request so the browser skips the CORS
+      // preflight - Apps Script has no OPTIONS handler and would otherwise fall
+      // through to a (missing) doGet and never run doPost. no-cors because this
+      // is fire-and-forget: we don't need to read the response.
       fetch(url, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        mode: "no-cors",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
         body: JSON.stringify({ entryId: id }),
       }).catch(() => {});
     } catch (e) { /* ignore - notification is best-effort */ }
