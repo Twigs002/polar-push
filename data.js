@@ -189,6 +189,21 @@ window.DATA = (() => {
     }).eq("id", id);
     if (error) throw error;
     invalidate();
+    notifyDecline(id);
+  }
+
+  // Fire-and-forget: ask the Gmail Apps Script web app to email the submitter.
+  // Never block or fail the rejection on the email (the reject already stuck).
+  function notifyDecline(id) {
+    const url = (window.QUAY && QUAY.DECLINE_MAIL_URL) || "";
+    if (!url) return;
+    try {
+      fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ entryId: id }),
+      }).catch(() => {});
+    } catch (e) { /* ignore - notification is best-effort */ }
   }
 
   async function updateEntry(id, patch) {
