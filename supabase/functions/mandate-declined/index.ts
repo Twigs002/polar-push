@@ -8,6 +8,8 @@
 // Required secrets (supabase secrets set ...):
 //   RESEND_API_KEY        Resend API key
 //   MANDATE_FROM_EMAIL    e.g. "Quay 1 Polar Push <polar-push@quay1.co.za>"
+// Optional:
+//   MANDATE_CC            comma-separated CC list; defaults to Sheldon + Diego.
 // Provided automatically to Edge Functions:
 //   SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
 //
@@ -18,6 +20,7 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const FALLBACK_EMAIL_DOMAIN = "quay1.co.za";
+const DEFAULT_CC = "sheldon@quay1.co.za,diego@quay1.co.za";
 
 const BRAND = {
   blue: "#3D5BA6",
@@ -113,6 +116,9 @@ Deno.serve(async (req) => {
       ? String(staff.email)
       : `${username}@${FALLBACK_EMAIL_DOMAIN}`;
 
+    const cc = (Deno.env.get("MANDATE_CC") ?? DEFAULT_CC)
+      .split(",").map((s) => s.trim()).filter((s) => s.includes("@") && s !== to);
+
     const html = emailBody({
       name: staff?.name || rec.submitted_by_name || "",
       team: team?.name || "your team",
@@ -131,6 +137,7 @@ Deno.serve(async (req) => {
       body: JSON.stringify({
         from: Deno.env.get("MANDATE_FROM_EMAIL") || "Polar Push <polar-push@quay1.co.za>",
         to: [to],
+        cc,
         subject: "Your Polar Push mandate needs attention",
         html,
       }),
