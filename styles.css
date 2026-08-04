@@ -810,11 +810,12 @@ table.dt td.num, table.dt th.num { text-align: right; font-variant-numeric: tabu
 }
 .pp-board-head h2, .pp-card-head h2 { margin: 0; }
 .pp-leader-note { font-size: 12px; font-weight: 700; color: var(--blue-800); }
-.pp-rows { display: flex; flex-direction: column; gap: 10px; }
+.pp-rows { column-count: 2; column-gap: 10px; }
 .pp-row {
   display: flex; align-items: center; gap: 14px;
   background: var(--card); border: 1px solid var(--line);
   border-radius: var(--r-lg); padding: 11px 18px; box-shadow: var(--shadow-sm);
+  margin-bottom: 10px; break-inside: avoid; -webkit-column-break-inside: avoid;
 }
 .pp-row-top { border-color: var(--sky); }
 .pp-row-1 { border-left: 4px solid var(--yellow); }
@@ -1039,6 +1040,7 @@ table.dt td.num, table.dt th.num { text-align: right; font-variant-numeric: tabu
   .pp-preview { text-align: center; }
 
   /* Standings rows */
+  .pp-rows { column-count: 1; }
   .pp-row { padding: 10px 12px; gap: 10px; }
   .pp-rank { width: 26px; flex-basis: 26px; font-size: 18px; }
   .pp-team { font-size: 14px; }
