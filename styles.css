@@ -1102,6 +1102,41 @@ table.dt td.num, table.dt th.num { text-align: right; font-variant-numeric: tabu
 #otp-refresh.pp-spin, #pp-refresh.pp-spin { animation: pp-spin-kf .8s linear infinite; }
 .pp-board-controls { display: inline-flex; align-items: center; gap: 10px; margin-left: auto; }
 
+/* Screenshot "Board" - clean Polar Push standings for sharing */
+.pp-board-page { max-width: 720px; margin: 0 auto; }
+.pp-bd-hero {
+  background: var(--blue-700, #3D5BA6); color: #fff; text-align: center;
+  border-radius: var(--r-lg, 14px) var(--r-lg, 14px) 0 0; padding: 26px 20px 22px;
+}
+.pp-bd-hero-icon { font-size: 26px; }
+.pp-bd-hero-eyebrow { text-transform: uppercase; letter-spacing: .14em; font-size: 12px; opacity: .85; margin-top: 4px; }
+.pp-bd-hero-title { margin: 2px 0 0; font-size: 34px; font-weight: 900; line-height: 1.05; }
+.pp-bd-hero-sub { margin-top: 6px; font-size: 13px; color: var(--yellow, #FDC503); font-weight: 700; }
+.pp-bd-card {
+  background: var(--card, #fff); border: 1px solid var(--line, #e5e7eb); border-top: none;
+  border-radius: 0 0 var(--r-lg, 14px) var(--r-lg, 14px);
+  padding: 22px 26px 18px; box-shadow: var(--shadow-sm, 0 1px 3px rgba(0,0,0,.06));
+}
+.pp-bd-title { text-align: center; color: var(--yellow, #FDC503); font-weight: 800; margin: 4px 0 18px; }
+.pp-bd-table { width: 100%; border-collapse: collapse; }
+.pp-bd-table th {
+  text-align: left; color: var(--blue-700, #3D5BA6); font-weight: 700; font-size: 13px;
+  padding: 0 10px 10px; border-bottom: 2px solid var(--line, #e5e7eb);
+}
+.pp-bd-table th.num { text-align: right; }
+.pp-bd-th-sub { display: block; font-weight: 500; font-size: 10px; color: var(--muted, #6b7280); text-transform: none; letter-spacing: 0; }
+.pp-bd-table td { padding: 11px 10px; border-bottom: 1px solid var(--line, #eef0f4); font-size: 14px; }
+.pp-bd-table td.num { text-align: right; }
+.pp-bd-rankcol { width: 34px; text-align: center; }
+.pp-bd-num { font-weight: 700; color: var(--muted, #6b7280); }
+.pp-bd-team { font-weight: 600; }
+.pp-bd-total { font-weight: 800; color: var(--blue-800, #2f4a86); font-size: 15px; }
+.pp-bd-sub { color: var(--muted, #6b7280); font-weight: 500; font-size: 12px; }
+.pp-bd-top-1 { background: rgba(253, 197, 3, .12); }
+.pp-bd-top-2 { background: rgba(152, 197, 237, .16); }
+.pp-bd-top-3 { background: rgba(152, 197, 237, .08); }
+.pp-bd-foot { text-align: center; color: var(--muted, #6b7280); font-size: 12px; margin: 14px 0 2px; }
+
 /* Reject-reason modal */
 .pp-modal-overlay {
   position: fixed; inset: 0; z-index: 1000;
