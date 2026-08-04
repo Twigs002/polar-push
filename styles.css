@@ -1133,6 +1133,8 @@ table.dt td.num, table.dt th.num { text-align: right; font-variant-numeric: tabu
 .pp-bd-total { font-weight: 800; color: var(--blue-800, #2f4a86); font-size: 15px; }
 .pp-bd-sub { color: var(--muted, #6b7280); font-weight: 500; font-size: 12px; }
 .pp-bd-foot { text-align: center; color: var(--muted, #6b7280); font-size: 12px; margin: 14px 0 2px; }
+.pp-bd-toolbar { max-width: 720px; margin: 0 auto 12px; display: flex; justify-content: flex-end; }
+.pp-bd-export { font-size: 13px; padding: 8px 16px; }
 
 /* Traffic-light legend + row banding */
 .pp-bd-legend { display: flex; flex-wrap: wrap; gap: 8px 16px; justify-content: center; margin: -8px 0 16px; font-size: 12px; font-weight: 700; }
@@ -1147,6 +1149,20 @@ tr.pp-bd-band-amber { background: rgba(232, 163, 0, .10); }
 tr.pp-bd-band-amber td:first-child { box-shadow: inset 3px 0 0 #e8a300; }
 tr.pp-bd-band-red { background: rgba(210, 10, 3, .06); }
 tr.pp-bd-band-red td:first-child { box-shadow: inset 3px 0 0 #D20A03; }
+
+/* Print / Export-to-PDF: just the branded board, no app chrome, colours kept */
+@media print {
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  .topnav, .user-chip, #signin, #signout, .pp-bd-toolbar { display: none !important; }
+  body, .app, .view, #view { margin: 0 !important; padding: 0 !important; background: #fff !important; }
+  .pp-board-page { max-width: 100% !important; margin: 0 !important; }
+  .pp-bd-hero, .pp-bd-card { box-shadow: none !important; }
+  .pp-bd-hero { border-radius: 0 !important; }
+  .pp-bd-card { border-radius: 0 !important; border: none !important; }
+  .pp-bd-table thead { display: table-header-group; }   /* repeat header each page */
+  .pp-bd-table tr { break-inside: avoid; }
+  @page { margin: 12mm; }
+}
 
 /* Reject-reason modal */
 .pp-modal-overlay {

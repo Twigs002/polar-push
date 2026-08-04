@@ -62,6 +62,7 @@
 
     $view.innerHTML = `
       <div class="pp-board-page">
+        <div class="pp-bd-toolbar"><button class="btn-primary pp-bd-export" id="pp-bd-export">⬇ Export PDF</button></div>
         <section class="pp-bd-hero">
           <div class="pp-bd-hero-icon" aria-hidden="true">⚡❄️</div>
           <div class="pp-bd-hero-eyebrow">Operation</div>
@@ -101,6 +102,9 @@
           ` : `<p class="muted" style="padding:24px;text-align:center">No verified deals on the board yet - it's all to play for.</p>`}
         </div>
       </div>`;
+
+    const $exp = $view.querySelector("#pp-bd-export");
+    if ($exp) $exp.addEventListener("click", () => window.print());
   }
 
   window.VIEWS = window.VIEWS || {};
