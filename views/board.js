@@ -24,8 +24,7 @@
       return;
     }
 
-    // Only teams that have scored a verified deal appear (keeps the board clean
-    // for screenshots - the 0-point teams would swamp it).
+    // Every team is shown - the teams at the bottom should see they're behind.
     const rows = (res.standings || []).map((s) => ({
       team: s.team,
       total: n(s.total_points),
@@ -34,10 +33,19 @@
       mPts: s.mandate_points != null ? n(s.mandate_points) : null,
       sPts: s.sale_points != null ? n(s.sale_points) : null,
       entries: n(s.entry_count),
-    })).filter((r) => r.entries > 0);
+    }));
     rows.sort((a, b) => b.total - a.total || (a.team || "").localeCompare(b.team || ""));
     let place = 0, last = null;
     rows.forEach((r, i) => { if (r.total !== last) { place = i + 1; last = r.total; } r.rank = place; });
+
+    // Traffic-light banding: no points yet = red (behind); of the teams that
+    // have scored, the top third are green (leading), the rest amber.
+    const scorers = rows.filter((r) => r.total > 0);
+    const greenCut = Math.max(1, Math.ceil(scorers.length / 3));
+    rows.forEach((r) => {
+      if (r.total <= 0) { r.band = "red"; return; }
+      r.band = scorers.indexOf(r) < greenCut ? "green" : "amber";
+    });
 
     // Show the points split once the standings view carries it; until the
     // migration runs, fall back to plain deal counts.
@@ -62,6 +70,11 @@
         </section>
         <div class="pp-bd-card">
           <h2 class="pp-bd-title">Team Standings</h2>
+          <div class="pp-bd-legend">
+            <span class="pp-bd-lg pp-bd-lg-green">Leading</span>
+            <span class="pp-bd-lg pp-bd-lg-amber">In the mix</span>
+            <span class="pp-bd-lg pp-bd-lg-red">Behind &ndash; no points yet</span>
+          </div>
           ${rows.length ? `
           <div class="pp-table-wrap">
             <table class="pp-bd-table">
@@ -74,7 +87,7 @@
               </tr></thead>
               <tbody>
                 ${rows.map((r) => `
-                  <tr class="${r.rank <= 3 ? "pp-bd-top pp-bd-top-" + r.rank : ""}">
+                  <tr class="pp-bd-band-${r.band}">
                     <td class="pp-bd-rankcol">${medal(r.rank)}</td>
                     <td class="pp-bd-team">${escapeHtml(r.team || "")}</td>
                     <td class="num">${cell(r.mPts, r.mandates)}</td>
