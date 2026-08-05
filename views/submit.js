@@ -44,6 +44,7 @@
         <div class="pp-card pp-entry-card">
           <h2>Submit a mandate</h2>
           <p class="muted">Log your signed mandate and attach the document. It goes to front office and only earns points once an admin verifies it. (Sales / OTPs are tracked separately.)</p>
+          <p class="pp-tcs"><a href="https://docs.google.com/document/d/1enQTpwbnMJJCsgJ4dP3Xgku9_c0ETOtqjjpIxQxkbQc/edit?tab=t.0" target="_blank" rel="noopener noreferrer">📄 Polar Push T&amp;Cs</a></p>
           ${teams.length ? "" : `<p class="pp-warn">No teams are set up yet - ask an admin.</p>`}
           <form id="submit-form" class="pp-form" ${teams.length ? "" : "hidden"}>
             <div class="pp-form-grid">

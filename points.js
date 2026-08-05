@@ -14,18 +14,22 @@
 //     Dual mandate / Signed open mandate .... 1   (1, 2, 3, 4, …)
 //     Sale OTP / Lease ...................... 4   (4, 8, 12, 16, …)
 //
-//   points = base × bracket
+//   Leases (rentals) bracket on DOUBLE their value (valueMult = 2), so a
+//   rental is worth twice its rand value when working out the bracket:
+//     lease points = 4 × (floor((2 × value) / 5m) + 1)
+//
+//   points = base × bracket(value × valueMult)
 window.POINTS = (() => {
   const BRACKET_SIZE = 5_000_000;
 
   // Canonical deal types. `label` drives the admin dropdown; `base` is the
   // per-bracket point value; `group` buckets them for the standings breakdown.
   const TYPES = [
-    { key: "sole",  base: 2, label: "Sole mandate",          group: "Mandates" },
-    { key: "dual",  base: 1, label: "Dual mandate",          group: "Mandates" },
-    { key: "open",  base: 1, label: "Signed open mandate",   group: "Mandates" },
-    { key: "otp",   base: 4, label: "Sale (OTP)",            group: "Sales" },
-    { key: "lease", base: 4, label: "Lease",                 group: "Sales" },
+    { key: "sole",  base: 2, valueMult: 1, label: "Sole mandate",          group: "Mandates" },
+    { key: "dual",  base: 1, valueMult: 1, label: "Dual mandate",          group: "Mandates" },
+    { key: "open",  base: 1, valueMult: 1, label: "Signed open mandate",   group: "Mandates" },
+    { key: "otp",   base: 4, valueMult: 1, label: "Sale (OTP)",            group: "Sales" },
+    { key: "lease", base: 4, valueMult: 2, label: "Lease",                 group: "Sales" },
   ];
   const BY_KEY = Object.fromEntries(TYPES.map(t => [t.key, t]));
   // Only mandates are submitted through the portal. Sales (OTP / lease) are
@@ -40,7 +44,9 @@ window.POINTS = (() => {
   function points(dealType, valueRand) {
     const t = BY_KEY[dealType];
     if (!t) return 0;
-    return t.base * bracket(valueRand);
+    // Leases bracket on double their value (valueMult = 2); everything else on
+    // its face value. Mirrors the DB `points` generated column exactly.
+    return t.base * bracket((Number(valueRand) || 0) * (t.valueMult || 1));
   }
 
   // "R5m-R10m" style label for the bracket a value falls into.
