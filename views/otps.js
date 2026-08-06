@@ -1,9 +1,11 @@
-// OTP tracking - accepted sales pulled daily from the front-office sheet.
-// Public (readable without a PIN) via the polar_push_otps_public view.
+// Sales & rentals tracking - accepted sales (OTPs) and rentals (leases) pulled
+// daily from the front-office sheet. Public (readable without a PIN) via the
+// polar_push_otps_public view.
 (function () {
   const { escapeHtml } = UTILS;
 
   function money(v) { return "R" + (Number(v) || 0).toLocaleString("en-ZA"); }
+  function dealLabel(t) { return t === "lease" ? "Rental" : "Sale"; }
   function fmtDate(s) {
     if (!s) return "";
     const d = new Date(s);
@@ -18,23 +20,26 @@
     try {
       const res = await DATA.loadOtps(force);
       if (!res.ready) {
-        $body.innerHTML = `<tr><td colspan="4" class="pp-otp-empty">OTP tracking isn't set up yet.</td></tr>`;
+        $body.innerHTML = `<tr><td colspan="5" class="pp-otp-empty">Tracking isn't set up yet.</td></tr>`;
         $meta.textContent = "";
       } else if (!res.otps.length) {
-        $body.innerHTML = `<tr><td colspan="4" class="pp-otp-empty">No OTPs yet - accepted sales from 1 Aug appear here once the daily sync runs.</td></tr>`;
+        $body.innerHTML = `<tr><td colspan="5" class="pp-otp-empty">Nothing yet - accepted sales and rentals from 1 Aug appear here once the daily sync runs.</td></tr>`;
         $meta.textContent = `Updated ${UTILS.humanAgo(res.at)}`;
       } else {
         $body.innerHTML = res.otps.map(o => `<tr>
           <td>${escapeHtml(o.team || "")}</td>
+          <td><span class="pp-deal pp-deal-${o.deal_type === "lease" ? "rental" : "sale"}">${dealLabel(o.deal_type)}</span></td>
           <td>${escapeHtml(fmtDate(o.acceptance_date))}</td>
           <td class="num">${money(o.amount)}</td>
           <td class="num"><strong>${Number(o.points) || 0}</strong></td>
         </tr>`).join("");
         const totalPts = res.otps.reduce((n, o) => n + (Number(o.points) || 0), 0);
-        $meta.textContent = `${res.otps.length} OTP${res.otps.length === 1 ? "" : "s"} · ${totalPts} pts · updated ${UTILS.humanAgo(res.at)}`;
+        const nSales = res.otps.filter(o => o.deal_type !== "lease").length;
+        const nRentals = res.otps.length - nSales;
+        $meta.textContent = `${nSales} sale${nSales === 1 ? "" : "s"} · ${nRentals} rental${nRentals === 1 ? "" : "s"} · ${totalPts} pts · updated ${UTILS.humanAgo(res.at)}`;
       }
     } catch (e) {
-      $body.innerHTML = `<tr><td colspan="4" class="pp-otp-empty">Could not load OTPs: ${escapeHtml(e.message || String(e))}</td></tr>`;
+      $body.innerHTML = `<tr><td colspan="5" class="pp-otp-empty">Could not load: ${escapeHtml(e.message || String(e))}</td></tr>`;
     } finally {
       if ($btn) { $btn.disabled = false; $btn.classList.remove("pp-spin"); }
     }
@@ -45,19 +50,19 @@
       <div class="pp-card">
         <div class="pp-card-head">
           <div>
-            <h2>OTP tracking</h2>
+            <h2>Sales &amp; rentals tracking</h2>
             <div class="muted small" id="otp-meta">Loading…</div>
           </div>
-          <button class="btn-ghost" id="otp-refresh" title="Re-check for new OTPs">↻ Refresh</button>
+          <button class="btn-ghost" id="otp-refresh" title="Re-check for new sales &amp; rentals">↻ Refresh</button>
         </div>
-        <p class="muted">Accepted sales (OTPs) pulled directly from Dealflow once a day. Points are allocated per the R5m brackets.</p>
+        <p class="muted">Accepted sales (OTPs) and rentals pulled directly from Dealflow once a day. Points are allocated per the R5m brackets - rentals are scored on double their value.</p>
         <div class="pp-table-wrap">
           <table class="pp-entries">
             <thead><tr>
-              <th>Team</th><th>Acceptance date</th>
+              <th>Team</th><th>Type</th><th>Acceptance date</th>
               <th class="num">Amount</th><th class="num">Points allocated</th>
             </tr></thead>
-            <tbody id="otp-body"><tr><td colspan="4" class="pp-otp-empty">Loading…</td></tr></tbody>
+            <tbody id="otp-body"><tr><td colspan="5" class="pp-otp-empty">Loading…</td></tr></tbody>
           </table>
         </div>
       </div>`;
