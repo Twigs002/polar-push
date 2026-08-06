@@ -74,7 +74,7 @@
           <div class="pp-bd-legend">
             <span class="pp-bd-lg pp-bd-lg-green">Leading</span>
             <span class="pp-bd-lg pp-bd-lg-amber">In the mix</span>
-            <span class="pp-bd-lg pp-bd-lg-red">Behind &ndash; no points yet</span>
+            <span class="pp-bd-lg pp-bd-lg-red">Behind - no points yet</span>
           </div>
           ${rows.length ? `
           <div class="pp-table-wrap">

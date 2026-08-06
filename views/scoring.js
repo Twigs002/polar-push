@@ -19,6 +19,7 @@
         <div class="pp-card">
           <h2>How points are earned</h2>
           <p class="muted">Points step up one full bracket for every <strong>R5 million</strong> of deal value.
+            Rentals (leases) bracket on <strong>double</strong> their rand value, so a R3m rental is scored as if it were R6m.
             A mandate or sale only counts once it's been submitted to front office and properly signed -
             missing signatures, initials or dates mean it won't be verified. Deals that later fall through have their points deducted.</p>
 
@@ -33,7 +34,7 @@
               <tbody>
                 ${POINTS.TYPES.map(t => `
                   <tr>
-                    <td class="pp-rules-type">${escapeHtml(t.label)}<span class="pp-rules-base">${t.base} pt / bracket</span></td>
+                    <td class="pp-rules-type">${escapeHtml(t.label)}<span class="pp-rules-base">${t.base} pt / bracket${t.valueMult > 1 ? " · value counts double" : ""}</span></td>
                     ${BRACKETS.map(b => `<td>${pointsCell(t.base, b.mult)}</td>`).join("")}
                   </tr>`).join("")}
               </tbody>
@@ -73,7 +74,11 @@
       const pts = POINTS.points(type, v);
       $pts.textContent = pts;
       if (!raw) { $detail.textContent = "Enter a value to see the score."; return; }
-      $detail.innerHTML = `${escapeHtml(POINTS.typeLabel(type))} · ${escapeHtml(POINTS.bracketLabel(v))} → <strong>${pts} points</strong>`;
+      // Leases bracket on double their value - label the bracket the points
+      // were actually worked out from, so the detail line can't contradict them.
+      const mult = (POINTS.BY_KEY[type] || {}).valueMult || 1;
+      const bracketText = POINTS.bracketLabel(v * mult) + (mult > 1 ? " · counts double" : "");
+      $detail.innerHTML = `${escapeHtml(POINTS.typeLabel(type))} · ${escapeHtml(bracketText)} → <strong>${pts} points</strong>`;
     }
 
     // Live thousands-grouping while typing.
