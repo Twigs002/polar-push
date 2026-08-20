@@ -1029,7 +1029,7 @@ table.dt td.num, table.dt th.num { text-align: right; font-variant-numeric: tabu
   .topnav { flex-wrap: wrap; gap: 8px 12px; padding: 9px 12px; }
   .brand { gap: 12px; }
   .brand-logo { height: 42px; }
-  .topnav-divider { height: 28px; }
+  .topnav-divider { display: none; }
   .brand-name { font-size: 16px; letter-spacing: 0.04em; }
   .brand-sub { display: none; }   /* hide subtitle on small screens, matching the other apps */
   .user-chip { margin-left: auto; gap: 8px; }
