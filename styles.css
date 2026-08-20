@@ -40,6 +40,12 @@
   --shadow:    0 2px 6px rgba(30,46,89,.07), 0 8px 24px rgba(30,46,89,.07);
 
   --sans: 'Montserrat', system-ui, -apple-system, sans-serif;
+
+  /* ── Unified Quay 1 header (shared spec across all apps) ──────── */
+  --hdr-logo:    52px;   /* brand lockup height — matches leads / hubspot / boarding */
+  --hdr-pad-y:   16px;   /* topbar vertical padding */
+  --hdr-divider: 44px;   /* vertical divider height */
+  --hdr-title:   20px;   /* app title size */
 }
 
 * { box-sizing: border-box; }
@@ -166,21 +172,26 @@ body {
   display: flex;
   align-items: center;
   gap: 24px;
-  padding: 12px 24px;
+  padding: var(--hdr-pad-y) 24px;
   box-shadow: var(--shadow);
 }
 .brand {
-  display: flex; align-items: center; gap: 14px;
-  font-weight: 800; font-size: 15px;
+  display: flex; align-items: center; gap: 16px;
+  font-weight: 800; font-size: var(--hdr-title);
 }
-.brand-logo { height: 40px; width: auto; display: block; flex: none; }
+.brand-logo { height: var(--hdr-logo); width: auto; display: block; flex: none; }
 .topnav-divider {
-  width: 1px; height: 30px; background: rgba(255,255,255,0.28); flex: none;
+  width: 1px; height: var(--hdr-divider); background: rgba(255,255,255,0.28); flex: none;
 }
+.brand-titles { display: flex; flex-direction: column; line-height: 1.15; }
 .brand-name {
-  font-family: var(--serif, 'Montserrat', sans-serif);
-  color: #fff; text-transform: uppercase; letter-spacing: 0.12em;
-  font-size: 14px; font-weight: 700;
+  font-family: var(--sans);
+  color: #fff; text-transform: uppercase; letter-spacing: 0.04em;
+  font-size: var(--hdr-title); font-weight: 800;
+}
+.brand-sub {
+  font-size: 13px; font-weight: 500; letter-spacing: .01em;
+  color: rgba(255,255,255,.78); margin-top: 2px; text-transform: none;
 }
 .tabs {
   display: flex; gap: 4px; flex: 1;
@@ -1016,10 +1027,11 @@ table.dt td.num, table.dt th.num { text-align: right; font-variant-numeric: tabu
    ══════════════════════════════════════════════════════════════════════ */
 @media (max-width: 640px) {
   .topnav { flex-wrap: wrap; gap: 8px 12px; padding: 9px 12px; }
-  .brand { gap: 9px; }
-  .brand-logo { height: 30px; }
-  .topnav-divider { height: 22px; }
-  .brand-name { font-size: 12px; letter-spacing: 0.08em; }
+  .brand { gap: 12px; }
+  .brand-logo { height: 42px; }
+  .topnav-divider { height: 28px; }
+  .brand-name { font-size: 16px; letter-spacing: 0.04em; }
+  .brand-sub { display: none; }   /* hide subtitle on small screens, matching the other apps */
   .user-chip { margin-left: auto; gap: 8px; }
   .user-chip .muted { display: none; }           /* keep just the Sign out button */
   .topnav .btn-ghost { padding: 7px 12px; font-size: 13px; }
