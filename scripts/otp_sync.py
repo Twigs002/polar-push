@@ -1,14 +1,23 @@
 #!/usr/bin/env python3
 """Sync OTP sales + rentals from the "Polar project" Google Sheet into polar_push_entries.
 
-Reads the sheet (columns: divisionName, refNumber, acceptanceDate, purchasePrice)
-and upserts, for the competition window (01 Aug - 30 Sep 2026):
+Reads the sheet (columns: divisionName, refNumber, acceptanceDate, purchasePrice,
+dealStatus) and upserts, for the competition window (01 Aug - 30 Sep 2026):
   * S-prefix rows  -> VERIFIED 'otp'   entries  (sales)
   * R-prefix rows  -> VERIFIED 'lease' entries  (rentals; the DB scores leases on
                                                  DOUBLE their value)
 Each is keyed on its refNumber so re-runs never duplicate and admin voids/rejects
 are preserved. Rental divisions come through as "Rentals - <Team>" - the leading
 "Rentals" label is stripped before matching the division to a competition team.
+
+Fall-throughs: dealStatus is authoritative. A row flagged FALLEN_THROUGH (or
+DUPLICATE) does not score, so it is dropped from the qualifying set; the same
+holds if the row vanishes from the sheet entirely. Because standings only count
+verified, non-voided entries, each run reconciles: any sheet-sourced entry no
+longer in the qualifying set is voided (0 pts), and one that reappears (status
+cleared back to OPEN/PAID_OUT/etc.) is un-voided. Only entries the sync itself
+voided (a sentinel void_reason) are ever un-voided, so an admin's manual void
+survives.
 
 Env:
   SUPABASE_URL           e.g. https://dqszbqiimbfvmmnpgpsb.supabase.co
@@ -32,9 +41,18 @@ SEASON_END = datetime(2026, 9, 30)           # ...up to and including this day
 OTP_BASE = 4                                  # points per R5m bracket for a sale
 BRACKET = 5_000_000
 
+# Marks an entry the sync itself voided because its deal fell off the sheet.
+# Kept distinct from an admin's void so we only ever auto-un-void our own.
+VOID_REASON = "auto: fell through (no longer in OTP sheet)"
+
 # ref prefix -> competition deal type. S = sale (OTP), R = rental (lease).
 # Everything else (e.g. C = commercial) is not part of the competition.
 DEAL_TYPE_BY_PREFIX = {"S": "otp", "R": "lease"}
+
+# dealStatus values that mean the deal must NOT score: it collapsed
+# (FALLEN_THROUGH) or was a duplicate capture of another deal (DUPLICATE).
+# Any other status - OPEN, PAID_OUT, CM_APPROVED, or blank - counts as before.
+NON_COUNTING_STATUSES = {"FALLEN_THROUGH", "DUPLICATE"}
 
 # A few known aliases from the sheet -> competition team name.
 ALIASES = {
@@ -109,6 +127,51 @@ def parse_price(raw) -> float:
         return 0.0
 
 
+def reconcile_fallen_through(sb, expected_refs: set):
+    """Void sheet entries whose deal fell through; restore any that came back.
+
+    `expected_refs` is the set of refNumbers that qualified on THIS run. A
+    sheet-sourced entry missing from it has fallen off the sheet (deal collapsed,
+    or its date/price was cleared) and must stop scoring -> void it. One that is
+    back in the set but which we previously auto-voided is un-voided. Entries an
+    admin voided (a different void_reason) and portal submissions are untouched.
+
+    Returns (n_voided, n_restored).
+    """
+    # Safety valve: an empty qualifying set almost always means a failed/partial
+    # sheet read, not that every deal collapsed. Never mass-void on that.
+    if not expected_refs:
+        print("No qualifying rows this run; skipping fall-through reconciliation.")
+        return 0, 0
+
+    sheet_entries = (sb.table("polar_push_entries")
+                     .select("reference,voided,void_reason")
+                     .eq("source", "sheet").execute().data or [])
+
+    to_void = [e["reference"] for e in sheet_entries
+               if e["reference"] and e["reference"] not in expected_refs and not e["voided"]]
+    to_restore = [e["reference"] for e in sheet_entries
+                  if e["reference"] and e["reference"] in expected_refs
+                  and e["voided"] and e.get("void_reason") == VOID_REASON]
+
+    for i in range(0, len(to_void), 200):
+        part = to_void[i:i + 200]
+        (sb.table("polar_push_entries")
+         .update({"voided": True, "void_reason": VOID_REASON})
+         .in_("reference", part).execute())
+    for i in range(0, len(to_restore), 200):
+        part = to_restore[i:i + 200]
+        (sb.table("polar_push_entries")
+         .update({"voided": False, "void_reason": None})
+         .in_("reference", part).execute())
+
+    if to_void:
+        print(f"Voided {len(to_void)} fallen-through deal(s): {', '.join(sorted(to_void))}")
+    if to_restore:
+        print(f"Restored {len(to_restore)} reappeared deal(s): {', '.join(sorted(to_restore))}")
+    return len(to_void), len(to_restore)
+
+
 def main() -> None:
     # Not armed yet? Skip cleanly (green run) instead of failing every schedule.
     if not (os.environ.get("SUPABASE_SERVICE_KEY") and os.environ.get("GCP_SA_JSON")):
@@ -128,17 +191,21 @@ def main() -> None:
         return
     body = rows[1:]  # drop header
 
-    records, skipped, unmatched = [], 0, {}
+    records, skipped, unmatched, excluded_status = [], 0, {}, 0
     for r in body:
         div = (r[0] if len(r) > 0 else "").strip()
         ref = (r[1] if len(r) > 1 else "").strip()
         date_raw = r[2] if len(r) > 2 else ""
         price_raw = r[3] if len(r) > 3 else ""
+        deal_status = (r[4] if len(r) > 4 else "").strip().upper()
 
         deal_type = DEAL_TYPE_BY_PREFIX.get(ref[:1].upper()) if ref else None
         if deal_type is None:
             skipped += 1
             continue  # sales (S) + rentals (R) only; commercial/other skipped
+        if deal_status in NON_COUNTING_STATUSES:
+            excluded_status += 1
+            continue  # fell through / duplicate -> must not score (reconcile voids it)
         d = parse_date(date_raw)
         if d is None or d < SEASON_START or d.date() > SEASON_END.date():
             skipped += 1
@@ -196,10 +263,16 @@ def main() -> None:
             chunk = deduped[i:i + 500]
             sb.table("polar_push_entries").upsert(chunk, on_conflict="reference").execute()
 
+    # Reconcile fall-throughs: void sheet entries no longer in the qualifying
+    # set, and restore any we previously auto-voided that have reappeared.
+    n_voided, n_restored = reconcile_fallen_through(sb, {rec["reference"] for rec in deduped})
+
     n_otp = sum(1 for rec in deduped if rec["deal_type"] == "otp")
     n_lease = sum(1 for rec in deduped if rec["deal_type"] == "lease")
     print(f"Sync complete: {len(deduped)} upserted "
-          f"({n_otp} OTP, {n_lease} rental), {skipped} skipped.")
+          f"({n_otp} OTP, {n_lease} rental), {skipped} skipped, "
+          f"{excluded_status} excluded (fallen-through/duplicate), "
+          f"{n_voided} voided (fell through), {n_restored} restored.")
     if unmatched:
         print("Unmatched divisions (no competition team; skipped):")
         for name, n in sorted(unmatched.items(), key=lambda kv: -kv[1]):
