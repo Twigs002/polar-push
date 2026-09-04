@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Sync OTP sales + rentals from the "Polar project" Google Sheet into polar_push_entries.
 
-Reads the sheet (columns: divisionName, refNumber, acceptanceDate, purchasePrice)
-and upserts, for the competition window (01 Aug - 30 Sep 2026):
+Reads the sheet (columns: divisionName, refNumber, acceptanceDate, purchasePrice,
+dealStatus) and upserts, for the competition window (01 Aug - 30 Sep 2026):
   * S-prefix rows  -> VERIFIED 'otp'   entries  (sales)
   * R-prefix rows  -> VERIFIED 'lease' entries  (rentals; the DB scores leases on
                                                  DOUBLE their value)
@@ -10,12 +10,14 @@ Each is keyed on its refNumber so re-runs never duplicate and admin voids/reject
 are preserved. Rental divisions come through as "Rentals - <Team>" - the leading
 "Rentals" label is stripped before matching the division to a competition team.
 
-Fall-throughs: a synced deal that later collapses vanishes from the sheet's
-qualifying set (the row is deleted, or its acceptanceDate / purchasePrice is
-cleared). Because standings only count verified, non-voided entries, each run
-reconciles: any sheet-sourced entry no longer in the qualifying set is voided
-(0 pts), and one that reappears is un-voided. Only entries the sync itself voided
-(a sentinel void_reason) are ever un-voided, so an admin's manual void survives.
+Fall-throughs: dealStatus is authoritative. A row flagged FALLEN_THROUGH (or
+DUPLICATE) does not score, so it is dropped from the qualifying set; the same
+holds if the row vanishes from the sheet entirely. Because standings only count
+verified, non-voided entries, each run reconciles: any sheet-sourced entry no
+longer in the qualifying set is voided (0 pts), and one that reappears (status
+cleared back to OPEN/PAID_OUT/etc.) is un-voided. Only entries the sync itself
+voided (a sentinel void_reason) are ever un-voided, so an admin's manual void
+survives.
 
 Env:
   SUPABASE_URL           e.g. https://dqszbqiimbfvmmnpgpsb.supabase.co
@@ -46,6 +48,11 @@ VOID_REASON = "auto: fell through (no longer in OTP sheet)"
 # ref prefix -> competition deal type. S = sale (OTP), R = rental (lease).
 # Everything else (e.g. C = commercial) is not part of the competition.
 DEAL_TYPE_BY_PREFIX = {"S": "otp", "R": "lease"}
+
+# dealStatus values that mean the deal must NOT score: it collapsed
+# (FALLEN_THROUGH) or was a duplicate capture of another deal (DUPLICATE).
+# Any other status - OPEN, PAID_OUT, CM_APPROVED, or blank - counts as before.
+NON_COUNTING_STATUSES = {"FALLEN_THROUGH", "DUPLICATE"}
 
 # A few known aliases from the sheet -> competition team name.
 ALIASES = {
@@ -184,17 +191,21 @@ def main() -> None:
         return
     body = rows[1:]  # drop header
 
-    records, skipped, unmatched = [], 0, {}
+    records, skipped, unmatched, excluded_status = [], 0, {}, 0
     for r in body:
         div = (r[0] if len(r) > 0 else "").strip()
         ref = (r[1] if len(r) > 1 else "").strip()
         date_raw = r[2] if len(r) > 2 else ""
         price_raw = r[3] if len(r) > 3 else ""
+        deal_status = (r[4] if len(r) > 4 else "").strip().upper()
 
         deal_type = DEAL_TYPE_BY_PREFIX.get(ref[:1].upper()) if ref else None
         if deal_type is None:
             skipped += 1
             continue  # sales (S) + rentals (R) only; commercial/other skipped
+        if deal_status in NON_COUNTING_STATUSES:
+            excluded_status += 1
+            continue  # fell through / duplicate -> must not score (reconcile voids it)
         d = parse_date(date_raw)
         if d is None or d < SEASON_START or d.date() > SEASON_END.date():
             skipped += 1
@@ -260,6 +271,7 @@ def main() -> None:
     n_lease = sum(1 for rec in deduped if rec["deal_type"] == "lease")
     print(f"Sync complete: {len(deduped)} upserted "
           f"({n_otp} OTP, {n_lease} rental), {skipped} skipped, "
+          f"{excluded_status} excluded (fallen-through/duplicate), "
           f"{n_voided} voided (fell through), {n_restored} restored.")
     if unmatched:
         print("Unmatched divisions (no competition team; skipped):")
