@@ -202,13 +202,22 @@ window.DATA = (() => {
       // preflight - Apps Script has no OPTIONS handler and would otherwise fall
       // through to a (missing) doGet and never run doPost. no-cors because this
       // is fire-and-forget: we don't need to read the response.
+      const secret = (window.QUAY && QUAY.DECLINE_MAIL_SECRET) || "";
+      const payload = secret ? { entryId: id, secret } : { entryId: id };
       fetch(url, {
         method: "POST",
         mode: "no-cors",
         headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify({ entryId: id }),
-      }).catch(() => {});
-    } catch (e) { /* ignore - notification is best-effort */ }
+        body: JSON.stringify(payload),
+      }).catch((err) => {
+        // no-cors means we can't read the response, so only a hard network
+        // failure surfaces here - but a fully silent down mailer is worse.
+        console.warn("Decline-notification email failed to send:", err);
+        try { window.toast && window.toast({ title: "Decline email may not have sent", body: "The rejection saved, but the notification mailer didn't respond.", ms: 5000 }); } catch (_) {}
+      });
+    } catch (e) {
+      console.warn("Decline-notification email could not be dispatched:", e);
+    }
   }
 
   async function updateEntry(id, patch) {

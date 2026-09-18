@@ -9,11 +9,12 @@
   const $signout = document.getElementById("signout");
   const $view = document.getElementById("view");
 
-  // Global toast - title/body are trusted HTML; callers escape dynamic bits.
+  // Global toast - title and body are rendered as escaped text (no caller
+  // passes markup), so dynamic content is XSS-safe without per-caller escaping.
   window.toast = function ({ title, body = "", ms = 4000 }) {
     const t = document.createElement("div");
     t.className = "toast";
-    t.innerHTML = `<div class="toast-title">${escapeHtml(title)}</div>${body ? `<div>${body}</div>` : ""}`;
+    t.innerHTML = `<div class="toast-title">${escapeHtml(title)}</div>${body ? `<div>${escapeHtml(body)}</div>` : ""}`;
     document.body.appendChild(t);
     requestAnimationFrame(() => t.classList.add("show"));
     setTimeout(() => { t.classList.remove("show"); setTimeout(() => t.remove(), 300); }, ms);
@@ -94,6 +95,10 @@
     const authed = !!user && !user.isPublic;
     let valid = window.VIEWS[tab] ? tab : "leaderboard";
     if (valid === "admin" && !(authed && user.isEditor)) valid = "leaderboard";
+    // Submit is for signed-in staff only. Direct hash nav by an unauthenticated
+    // user must fall back to the leaderboard (RLS also blocks the insert, but
+    // rendering the form to a public user is confusing UX).
+    if (valid === "submit" && !authed) valid = "leaderboard";
     document.querySelectorAll(".tabs a").forEach(a => a.classList.toggle("active", a.dataset.tab === valid));
     try {
       window.VIEWS[valid]($view, { user, cache });
