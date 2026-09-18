@@ -9,6 +9,13 @@ window.QUAY = {
   // Google Apps Script Web App that emails the submitter when a mandate is
   // declined (Gmail, same as the other Quay dashboards). Filled once deployed.
   DECLINE_MAIL_URL: "https://script.google.com/macros/s/AKfycbx55p4WGM1iCjIikJSrBg28REgddFnPsmH5VISPl54QEzxAIx--nzi-ivej5D8TqmUbCw/exec",
+  // Shared secret sent in the decline-mailer POST body as defense-in-depth.
+  // Must match the SHARED_SECRET Script property on the Apps Script web app.
+  // NOTE: this is client-visible (public site), so it's only marginal
+  // hardening against drive-by abuse of the "Anyone" endpoint - the real fix
+  // is a signed token. Leave "" to disable the check on both ends.
+  // TODO(user): set to a random string and mirror it in the Script property.
+  DECLINE_MAIL_SECRET: "",
 };
 
 // Operation Polar Push - 8-week team competition.

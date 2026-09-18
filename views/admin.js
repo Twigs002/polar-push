@@ -310,7 +310,7 @@
           window.toast({ title: "Deal added ✓", ms: 2500 });
           await rerender($view, user);
         } catch (err) {
-          window.toast({ title: "Could not add deal", body: escapeHtml(err.message || String(err)), ms: 6000 });
+          window.toast({ title: "Could not add deal", body: err.message || String(err), ms: 6000 });
           $submit.disabled = false; $submit.textContent = "Add deal";
         }
       });
@@ -335,7 +335,7 @@
             if (url) window.open(url, "_blank", "noopener");
             else window.toast({ title: "No document on file", ms: 3000 });
           } catch (err) {
-            window.toast({ title: "Could not open document", body: escapeHtml(err.message || String(err)), ms: 5000 });
+            window.toast({ title: "Could not open document", body: err.message || String(err), ms: 5000 });
           } finally {
             btn.disabled = false; btn.textContent = orig;
           }
@@ -398,7 +398,7 @@
           window.toast({ title: "Team added ✓", ms: 2500 });
           await rerender($view, user);
         } catch (err) {
-          window.toast({ title: "Could not add team", body: escapeHtml(err.message || String(err)), ms: 5000 });
+          window.toast({ title: "Could not add team", body: err.message || String(err), ms: 5000 });
         }
       });
     }
@@ -411,7 +411,7 @@
       window.toast({ title: okMsg + " ✓", ms: 2500 });
       await rerender($view, user);
     } catch (err) {
-      window.toast({ title: "Action failed", body: escapeHtml(err.message || String(err)), ms: 5000 });
+      window.toast({ title: "Action failed", body: err.message || String(err), ms: 5000 });
       btn.disabled = false;
     }
   }

@@ -180,7 +180,7 @@
         window.toast({ title: "Submitted for verification ✓", body: "Front office will review the mandate soon.", ms: 4000 });
         await rerender($view, user);
       } catch (err) {
-        window.toast({ title: "Could not submit", body: escapeHtml(err.message || String(err)), ms: 6000 });
+        window.toast({ title: "Could not submit", body: err.message || String(err), ms: 6000 });
         $btn.disabled = false; $btn.textContent = "Submit for verification";
       }
     });

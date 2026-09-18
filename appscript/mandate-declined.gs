@@ -9,6 +9,10 @@
  *        SUPABASE_SERVICE_KEY  <service-role key from Supabase -> Settings -> API>
  *      (optional) MANDATE_CC   sheldon@quay1.co.za,diego@quay1.co.za
  *      (optional) MANDATE_FROM_NAME  Polar Push
+ *      (optional) SHARED_SECRET      <random string; MUST also be set as
+ *                                     QUAY.DECLINE_MAIL_SECRET on the site>
+ *                 When set, POSTs without a matching body.secret are rejected.
+ *                 Client-visible (public site) so it's only marginal hardening.
  *   3. Deploy -> New deployment -> Web app.
  *        Execute as: Me.   Who has access: Anyone.
  *   4. Copy the Web app URL and send it to me; I wire it into the site.
@@ -37,6 +41,20 @@ function doPost(e) {
     if (!id) return _json({ error: "no entryId" });
 
     var p = PropertiesService.getScriptProperties();
+
+    // Defense-in-depth shared secret. Apps Script Web Apps cannot read custom
+    // request HTTP headers, and the site caller uses a "simple" no-cors POST
+    // (adding a custom header would trigger a CORS preflight this endpoint has
+    // no OPTIONS handler for), so the secret travels in the POST body instead.
+    // NOTE: the site is public, so this value is client-visible - it only
+    // marginally raises the bar against drive-by abuse of the "Anyone"
+    // deployment. The real fix is a signed token (JWT) - tracked as a follow-up.
+    // TODO(user): set the Script property SHARED_SECRET to a random string and
+    // put the SAME value in QUAY.DECLINE_MAIL_SECRET on the site. Until the
+    // property is set, the check is skipped so the endpoint keeps working.
+    var SECRET = p.getProperty("SHARED_SECRET");
+    if (SECRET && body.secret !== SECRET) return _json({ error: "unauthorized" });
+
     var SB = p.getProperty("SUPABASE_URL");
     var KEY = p.getProperty("SUPABASE_SERVICE_KEY");
     var CC = p.getProperty("MANDATE_CC") || "sheldon@quay1.co.za,diego@quay1.co.za";
@@ -69,7 +87,10 @@ function doPost(e) {
       "Your mandate was declined. Reason: " + (entry.reject_reason || "Not specified"),
       { htmlBody: html, cc: CC, name: FROM_NAME }
     );
-    return _json({ sent: to });
+    // Do NOT echo the recipient address - the endpoint is deployed "Anyone",
+    // and returning the resolved email would let it be used to harvest staff
+    // addresses. Return a generic acknowledgement instead.
+    return _json({ ok: true });
   } catch (err) {
     return _json({ error: String(err) });
   }
